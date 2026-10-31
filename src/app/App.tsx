@@ -32,12 +32,41 @@ const FEATURE_LAYERS = [
 ] as const
 
 const FEATURES = [
-  { name: 'auth', desc: 'Login, registrasi pendonor, sesi, guard per peran.' },
-  { name: 'blood-stock', desc: 'Kantong darah, stok, kedaluwarsa, status uji.' },
-  { name: 'blood-request', desc: 'Permintaan darah RS dan alur verifikasi UTD.' },
-  { name: 'donor', desc: 'Screening, tiket QR, riwayat dan interval donor.' },
-  { name: 'donor-location', desc: 'Lokasi dan jadwal layanan donor.' },
-  { name: 'notification', desc: 'Notifikasi in-app untuk perubahan status.' },
+  {
+    name: 'auth',
+    prd: 'UTD-01 · RS-01 · PDN-04',
+    desc: 'Login dashboard UTD/RS, registrasi & login pendonor, sesi, guard per peran.',
+  },
+  {
+    name: 'blood-stock',
+    prd: 'UTD-02 · UTD-03 · UTD-04 · RS-02',
+    desc: 'Input kantong, penyimpanan, monitoring stok per golongan/rhesus, ketersediaan real time.',
+  },
+  {
+    name: 'blood-request',
+    prd: 'UTD-06..09 · RS-03 · RS-04 · RS-06',
+    desc: 'Pengajuan request RS, verifikasi UTD, setujui/tolak, pelacakan status, konfirmasi terima.',
+  },
+  {
+    name: 'donor-location',
+    prd: 'PDN-02 · PDN-03 · EXT-03',
+    desc: 'Eksplorasi lokasi donor, detail kegiatan, filter jarak/tanggal, kelola lokasi oleh UTD.',
+  },
+  {
+    name: 'donor-registration',
+    prd: 'PDN-05 · PDN-06',
+    desc: 'Form donor & screening kesehatan, tiket digital QR, scan tiket oleh petugas UTD.',
+  },
+  {
+    name: 'donor-history',
+    prd: 'EXT-02',
+    desc: 'Riwayat donasi pendonor dan status kelayakan donor berikutnya.',
+  },
+  {
+    name: 'notification',
+    prd: 'UTD-05 · RS-05 · EXT-01 · EXT-04',
+    desc: 'Peringatan expired, notifikasi request ditolak/disetujui, pengingat jadwal donor.',
+  },
 ] as const
 
 const SHARED = [
@@ -89,12 +118,13 @@ function ArchitectureStatusPage() {
         ))}
       </ul>
 
-      <h3>Feature slice</h3>
+      <h3>Feature slice (sesuai modul PRD)</h3>
       <ul className="layer-list">
         {FEATURES.map((feature) => (
           <li className="layer-item" key={feature.name}>
             <code>features/{feature.name}</code>
             <span>{feature.desc}</span>
+            <span className="prd-ref">{feature.prd}</span>
           </li>
         ))}
       </ul>

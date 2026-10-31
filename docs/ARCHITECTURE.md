@@ -2,7 +2,8 @@
 
 Frontend **React 19 + TypeScript + Vite** dengan pendekatan **Feature-based Clean Architecture**:
 kode dipecah per **fitur bisnis** (vertical slice), dan setiap fitur memiliki **empat lapisan**
-clean architecture di dalamnya. Struktur ini diturunkan dari `PRD_DarahTerpadu_MVP_Sesuai_Alur.docx`.
+clean architecture di dalamnya. Struktur ini diturunkan dari `PRD_Aplikasi_Donor_Darah_Teks.md`
+(modul **UTD**, **PDN**, **RS**, **EXT**); pemetaan lengkap ada di §5.
 
 > **Status repositori:** masih kerangka. Yang sudah ada: `src/main.tsx`, `src/app/App.tsx`
 > (shell + rute placeholder), `src/shared/styles/global.css`, `index.ts` (public API kosong)
@@ -39,7 +40,7 @@ presentation  ──►  application  ──►  domain
 **Aturan antar fitur (horizontal):**
 
 - Fitur **tidak boleh** mengimpor ke dalam lapisan fitur lain
-  (`features/donor/application/...` ❌).
+  (`features/blood-stock/infrastructure/...` ❌).
 - Komunikasi antar fitur hanya lewat **public API** `features/<fitur>/index.ts` ✅.
 - Bila sebuah konsep dipakai ≥ 2 fitur dan tidak punya perilaku bisnis kaya, pindahkan ke
   `shared/` (mis. `shared/domain/blood-type.ts`).
@@ -56,21 +57,30 @@ src/
 │  ├─ App.tsx                  # shell aplikasi: BrowserRouter + layout + rute
 │  ├─ container.ts             # (rencana) merakit container seluruh fitur
 │  ├─ layouts/                 # kerangka halaman lintas fitur (AuthLayout, DashboardLayout)
-│  ├─ providers/               # komposisi React Context global (Auth, DemoData)
+│  ├─ pages/                   # halaman gabungan >1 fitur, dikelompokkan per peran
+│  │  ├─ public/               # landing PDN-01 (stok + lokasi)
+│  │  ├─ auth/                 # gerbang login/registrasi
+│  │  ├─ donor/                # dashboard pendonor
+│  │  ├─ utd/                  # dashboard Admin UTD/PMI
+│  │  └─ hospital/             # dashboard Admin RS
+│  ├─ providers/               # komposisi React Context global (Auth, Notifications)
 │  └─ router/                  # peta rute + guard per peran
 │
-├─ features/                   # satu folder = satu fitur bisnis
-│  ├─ auth/
-│  │  ├─ index.ts              # public API fitur — satu-satunya pintu masuk
-│  │  ├─ domain/
-│  │  ├─ application/
-│  │  ├─ infrastructure/
-│  │  └─ presentation/
-│  ├─ blood-stock/             # struktur sama dengan auth
-│  ├─ blood-request/
-│  ├─ donor/
-│  ├─ donor-location/
-│  └─ notification/
+├─ features/                   # satu folder = satu fitur bisnis (lihat §5)
+│  ├─ auth/                    # UTD-01, RS-01, PDN-04
+│  ├─ blood-stock/             # UTD-02, UTD-03, UTD-04, RS-02
+│  ├─ blood-request/           # UTD-06..UTD-09, RS-03, RS-04, RS-06
+│  ├─ donor-location/          # PDN-02, PDN-03, EXT-03
+│  ├─ donor-registration/      # PDN-05, PDN-06
+│  ├─ donor-history/           # EXT-02
+│  ├─ notification/            # UTD-05, RS-05, EXT-01, EXT-04
+│  │
+│  └─ <tiap fitur>/
+│     ├─ index.ts              # public API fitur — satu-satunya pintu masuk
+│     ├─ domain/
+│     ├─ application/
+│     ├─ infrastructure/
+│     └─ presentation/
 │
 └─ shared/                     # kernel, tanpa dependensi ke features/app
    ├─ domain/                  # value object lintas fitur (BloodType, UserRole, FacilityType)
@@ -161,23 +171,95 @@ import { InMemoryBloodBagRepository } from '@/features/blood-stock/infrastructur
 import { bloodBagRepository } from '@/features/blood-stock/infrastructure/container'
 ```
 
-## 5. Pemetaan fitur PRD → feature slice
+## 5. Pemetaan modul PRD → feature slice
 
-| ID | Fitur PRD | Feature slice | Application (use case) | Presentation |
+Setiap modul PRD dipetakan ke **tepat satu** feature slice (kecuali halaman gabungan).
+Kolom *Rute* adalah tempat UI-nya dirender.
+
+### 5.1 Ringkasan pembagian
+
+| Feature slice | Modul PRD | Peran pemakai |
+| --- | --- | --- |
+| `auth` | UTD-01, RS-01, PDN-04 | semua |
+| `blood-stock` | UTD-02, UTD-03, UTD-04, RS-02 | Admin UTD, Admin RS |
+| `blood-request` | UTD-06, UTD-07, UTD-08, UTD-09, RS-03, RS-04, RS-06 | Admin UTD, Admin RS |
+| `donor-location` | PDN-02, PDN-03, EXT-03 | publik, Admin UTD |
+| `donor-registration` | PDN-05, PDN-06 | pendonor, Admin UTD (scan) |
+| `donor-history` | EXT-02 | pendonor |
+| `notification` | UTD-05, RS-05, EXT-01, EXT-04 | semua |
+| `app/pages/public` | PDN-01 | publik (halaman gabungan) |
+
+### 5.2 Detail per modul
+
+| ID | Modul PRD | Feature slice | Use case | Rute / Presentation |
 | --- | --- | --- | --- | --- |
-| AU-01 | Login pengguna | `auth` | `login.use-case` | `pages/LoginPage` |
-| PD-03 | Registrasi pendonor | `auth` | `register-donor.use-case` | `pages/RegisterDonorPage` |
-| AU-02 | Input kantong darah | `blood-stock` | `create-blood-bag.use-case` | `pages/utd/BloodBagFormPage` |
-| AU-03, EX-01 | Stok & kedaluwarsa | `blood-stock` | `list-stock.use-case` | `pages/utd/StockPage` |
-| AR-02, EX-05 | Ketersediaan stok | `blood-stock` | `get-availability.use-case` | `pages/hospital/AvailabilityPage`, `pages/public/HomePage` |
-| AU-04..AU-06 | Request masuk UTD | `blood-request` | `verify-request.use-case`, `reject-request.use-case` | `pages/utd/RequestsPage` |
-| AR-03..AR-06 | Pengajuan request RS | `blood-request` | `create-request.use-case`, `list-requests.use-case` | `pages/hospital/*` |
-| PD-04 | Screening kesehatan | `donor` | `submit-screening.use-case` | `pages/donor/ScreeningPage` |
-| PD-05, EX-03 | Tiket QR & daftar hadir | `donor` | `issue-ticket.use-case`, `scan-ticket.use-case` | `pages/donor/TicketPage`, `pages/utd/ScanPage` |
-| EX-04 | Interval & riwayat donor | `donor` | `get-donation-history.use-case` | `pages/donor/HistoryPage` |
-| PD-01, PD-02 | Lokasi & jadwal donor | `donor-location` | `list-locations.use-case`, `list-schedules.use-case` | `pages/public/LocationsPage` |
-| EX-02 | Kelola lokasi/jadwal | `donor-location` | `create-location.use-case`, `update-schedule.use-case` | `pages/utd/LocationsPage` |
-| — | Notifikasi status | `notification` | `notify-request-status.use-case` | `components/NotificationBell` |
+| UTD-01 | Login dashboard UTD/PMI | `auth` | `login.use-case` | `/login` |
+| UTD-02 | Input kantong darah | `blood-stock` | `create-blood-bag.use-case` | `/utd/kantong/baru` |
+| UTD-03 | Penyimpanan database (kantong tersimpan) | `blood-stock` | `create-blood-bag.use-case`, `list-stock.use-case` | `/utd/stok` |
+| UTD-04 | Monitoring stok per golongan & rhesus | `blood-stock` | `get-stock-summary.use-case` | `/utd` (ringkasan) |
+| UTD-05 | Notifikasi expired | `notification` | `notify-expiring-bags.use-case` | `/utd/kadaluwarsa` + `NotificationBell` |
+| UTD-06 | Terima request RS | `blood-request` | `list-requests.use-case` | `/utd/permintaan` |
+| UTD-07 | Verifikasi & cek stok | `blood-request` | `verify-request.use-case` | `/utd/permintaan/:id` |
+| UTD-08 | Setujui / tolak request | `blood-request` | `approve-request.use-case`, `reject-request.use-case` | `/utd/permintaan/:id` |
+| UTD-09 | Update status request | `blood-request` | `update-request-status.use-case` | otomatis setelah UTD-08 |
+| PDN-01 | Landing page tanpa login | `app/pages/public` | komposisi `blood-stock` + `donor-location` | `/` |
+| PDN-02 | Eksplorasi lokasi donor | `donor-location` | `list-locations.use-case` | `/lokasi` |
+| PDN-03 | Detail donor darah | `donor-location` | `get-location-detail.use-case` | `/lokasi/:id` |
+| PDN-04 | Registrasi & login pendonor | `auth` | `register-donor.use-case`, `login.use-case` | `/register`, `/login` |
+| PDN-05 | Form donor & screening | `donor-registration` | `submit-screening.use-case` | `/donor/daftar` |
+| PDN-06 | Tiket digital QR Code | `donor-registration` | `issue-ticket.use-case`, `scan-ticket.use-case` | `/donor/tiket`, `/utd/scan` |
+| RS-01 | Login dashboard RS | `auth` | `login.use-case` | `/login` |
+| RS-02 | Cek ketersediaan real time | `blood-stock` | `get-availability.use-case` | `/rs/ketersediaan` |
+| RS-03 | Form request darah | `blood-request` | `create-request.use-case` | `/rs/permintaan/baru` |
+| RS-04 | Pelacakan status | `blood-request` | `list-requests.use-case`, `get-request.use-case` | `/rs/permintaan` |
+| RS-05 | Push notifikasi gagal | `notification` | `notify-request-rejected.use-case` | `NotificationBell` |
+| RS-06 | Konfirmasi penerimaan | `blood-request` | `confirm-receipt.use-case` | `/rs/permintaan/:id` |
+| EXT-01 | Notif ke RS saat disetujui | `notification` | `notify-request-approved.use-case` | `NotificationBell` |
+| EXT-02 | Riwayat donor | `donor-history` | `get-donation-history.use-case` | `/donor/riwayat` |
+| EXT-03 | Filter lokasi (jarak/tanggal) | `donor-location` | `list-locations.use-case` (filter param) | `/lokasi?jarak=&tanggal=` |
+| EXT-04 | Pengingat jadwal donor | `notification` (pakai data `donor-history`) | `notify-donor-schedule.use-case` | `/donor` |
+
+### 5.3 Entity yang dibagi antar fitur
+
+Entity yang dipakai lebih dari satu fitur diletakkan di `shared/domain/` agar tidak ada
+ketergantungan antar fitur:
+
+| Berkas | Dipakai oleh | Alasan |
+| --- | --- | --- |
+| `shared/domain/blood-type.ts` | `blood-stock`, `blood-request`, `donor-registration` | `BloodType`, `Rhesus`, `BloodComponent` murni nilai, tanpa perilaku kaya |
+| `shared/domain/user-role.ts` | `auth`, `app/router` | `UserRole` dipakai guard rute |
+| `shared/domain/facility.ts` | `blood-request`, `donor-location` | `FacilityType` (UTD/PMI vs RS) |
+
+Sebaliknya, entity yang punya aturan bisnis spesifik **tetap di dalam fiturnya**:
+
+| Entity | Fitur | Alasan |
+| --- | --- | --- |
+| `BloodBag` + `rules/stock.ts` | `blood-stock` | aturan kelayakan stok (status uji + expired) milik fitur ini |
+| `BloodRequest` + transisi status | `blood-request` | state machine PRD §6 hanya dipakai fitur ini |
+| `DonorRegistration` + `HealthScreening` | `donor-registration` | aturan screening & tiket QR |
+| `DonorLocation` + `DonorSchedule` | `donor-location` | aturan jadwal layanan |
+| `AppNotification` | `notification` | kanal & status baca |
+
+### 5.4 Status permintaan darah (PRD §6)
+
+State machine hidup di `features/blood-request/domain/rules/request-status.ts`:
+
+```
+        ┌──────────┐  setujui   ┌────────────┐  konfirmasi RS  ┌───────────┐
+  RS ──►│ Menunggu │───────────►│ Disetujui  │────────────────►│ Diterima  │
+        └────┬─────┘            └────────────┘                 └───────────┘
+             │ tolak (wajib alasan)
+             ▼
+        ┌─────────┐
+        │ Ditolak │
+        └─────────┘
+```
+
+- `menunggu` → dibuat sistem saat RS mengirim request (RS-03).
+- `disetujui` / `ditolak` → hanya Admin UTD/PMI (UTD-08); tolak wajib `rejectionReason`.
+- `diterima` → hanya Admin RS (RS-06).
+- Transisi lain ditolak oleh aturan domain, bukan oleh UI.
+- **Stok berkurang saat `diterima`**, bukan saat `disetujui` (lihat §9 no. 3).
 
 ## 6. Composition root & wiring
 
@@ -224,23 +306,48 @@ features/<fitur>/presentation/pages/*          # render UI
 8. **Bahasa UI** Indonesia; format tanggal lewat `shared/utils/format-date.ts`.
 9. **Aturan bisnis** ditulis sebagai fungsi murni di `domain/rules/` agar bisa diuji tanpa React.
 
-## 8. Status & langkah berikutnya
+## 8. Keputusan atas pertanyaan terbuka PRD (§10)
+
+Keputusan ini dipakai sebagai asumsi implementasi; ubah bila tim memutuskan lain.
+
+| No | Pertanyaan PRD | Keputusan | Dampak ke struktur |
+| --- | --- | --- | --- |
+| 1 | Tiket QR di-scan siapa? | Petugas **Admin UTD/PMI** di lokasi donor, lewat halaman `/utd/scan` | use case `scan-ticket` di `donor-registration`, halaman di `app/pages/utd/` |
+| 2 | Screening tidak lolos? | Tiket **tidak diterbitkan**; pendonor melihat alasan + opsi jadwal ulang | aturan `canIssueTicket` di `donor-registration/domain/rules/` |
+| 3 | Kapan stok berkurang? | Saat RS **konfirmasi penerimaan** (`diterima`). Status `disetujui` hanya **mereservasi** stok | `blood-request` memanggil `blood-stock` lewat use case, bukan langsung ke repository |
+| 4 | RS dapat notif saat disetujui? | **Ya** (EXT-01) | `notification/notify-request-approved.use-case` |
+| 5 | Siapa yang menginput lokasi donor? | **Admin UTD/PMI**, lewat menu `/utd/lokasi` | use case `create-location`/`update-location` di `donor-location` |
+| 6 | Nama aplikasi? | **DarahTerpadu** (sudah dipakai di seluruh dokumen & UI) | — |
+
+Catatan untuk no. 3: agar `blood-request` tidak mengimpor lapisan `blood-stock`, kebutuhan
+"kurangi stok" dideklarasikan sebagai **port** di
+`features/blood-request/application/ports/stock-writer-port.ts`, lalu diimplementasikan di
+`src/app/container.ts` dengan memakai use case `blood-stock`. Ini menjaga aturan "antar fitur
+hanya lewat public API".
+
+## 9. Status & langkah berikutnya
 
 Sudah ada:
 
 - `src/main.tsx` — bootstrap React + impor `@/shared/styles/global.css`.
 - `src/app/App.tsx` — shell (header/nav/footer), `BrowserRouter`, rute `/` dan `/status`.
 - `src/shared/styles/global.css` — design token + kelas dasar.
-- `src/features/<fitur>/index.ts` — public API kosong sebagai penanda batas fitur.
-- Folder `app/`, `features/*/{domain,application,infrastructure,presentation}`, `shared/*`
-  dengan `.gitkeep`.
+- `src/features/<fitur>/index.ts` — public API (masih kosong) untuk 7 fitur, masing-masing
+  mencantumkan ID modul PRD yang dicakup.
+- Folder `app/{pages,layouts,providers,router}`, `features/*/{domain,application,infrastructure,presentation}`,
+  `shared/*` dengan `.gitkeep`.
 
-Langkah berikutnya yang disarankan:
+Langkah berikutnya yang disarankan (mengikuti prioritas **Wajib** PRD):
 
-1. **`auth`** — entity `User`, `AuthRepository`, `login`/`logout`/`restore-session` use case,
-   `in-memory-auth-repository` + fixture akun demo, `AuthProvider`, `LoginPage`.
-2. **`app`** — `container.ts`, `router/AppRouter.tsx`, `router/guards.tsx`, `layouts/*`.
-3. **`shared`** — `domain/blood-type.ts`, `types/common.ts`, `constants/routes.ts`,
-   `utils/format-date.ts`, `ui/*` (Button, TextField, Select, Badge).
-4. **`blood-stock`** → **`blood-request`** → **`donor`** → **`donor-location`** →
-   **`notification`**, mengikuti urutan pada tabel §5.
+1. **`shared`** — `domain/blood-type.ts`, `domain/user-role.ts`, `types/common.ts`,
+   `constants/routes.ts`, `utils/format-date.ts`, `ui/*` (Button, TextField, Select, Badge).
+2. **`auth`** — entity `User`, `AuthRepository`, `login`/`logout`/`restore-session`/`register-donor`,
+   `in-memory-auth-repository` + akun demo, `AuthProvider`, `LoginPage` (UTD-01, RS-01, PDN-04).
+3. **`app`** — `container.ts`, `router/AppRouter.tsx`, `router/guards.tsx`, `layouts/*`,
+   serta halaman landing `app/pages/public/LandingPage.tsx` (PDN-01).
+4. **`blood-stock`** — UTD-02, UTD-03, UTD-04, RS-02 (input kantong + monitoring + ketersediaan).
+5. **`blood-request`** — RS-03, RS-04, UTD-06..UTD-09, RS-06 (state machine PRD §6).
+6. **`donor-location`** — PDN-02, PDN-03, EXT-03 + menu kelola lokasi UTD.
+7. **`donor-registration`** — PDN-05, PDN-06 (screening, tiket QR, scan UTD).
+8. **`notification`** — UTD-05, RS-05, EXT-01, EXT-04.
+9. **`donor-history`** — EXT-02 (bonus, dikerjakan terakhir).
