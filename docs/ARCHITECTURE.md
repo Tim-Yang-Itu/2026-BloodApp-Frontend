@@ -1,230 +1,246 @@
 # Arsitektur DarahTerpadu (Frontend)
 
-Frontend **React 19 + TypeScript + Vite** dengan pendekatan **Clean Architecture**.
-Struktur ini diturunkan dari `PRD_DarahTerpadu_MVP_Sesuai_Alur.docx`.
+Frontend **React 19 + TypeScript + Vite** dengan pendekatan **Feature-based Clean Architecture**:
+kode dipecah per **fitur bisnis** (vertical slice), dan setiap fitur memiliki **empat lapisan**
+clean architecture di dalamnya. Struktur ini diturunkan dari `PRD_DarahTerpadu_MVP_Sesuai_Alur.docx`.
 
-## 1. Aturan dependensi
+> **Status repositori:** masih kerangka. Yang sudah ada: `src/main.tsx`, `src/app/App.tsx`
+> (shell + rute placeholder), `src/shared/styles/global.css`, `index.ts` (public API kosong)
+> di tiap fitur, dan folder lapisan bertanda `.gitkeep`. Belum ada use case, repository,
+> maupun halaman fitur.
+
+## 1. Prinsip
+
+Ada dua sumbu pemisahan, dan keduanya dipakai bersamaan:
+
+1. **Sumbu fitur (vertical slice)** — satu folder `src/features/<fitur>/` berisi seluruh kode
+   untuk satu kemampuan bisnis, dari entitas sampai halaman. Menambah/menghapus fitur berarti
+   menambah/menghapus satu folder, bukan menyentuh folder global.
+2. **Sumbu lapisan (clean architecture)** — di dalam setiap fitur, dependensi hanya boleh
+   mengarah ke dalam:
 
 ```
 presentation  ──►  application  ──►  domain
-      │                │               ▲
-      └──► infrastructure ─────────────┘
-                   │
-                shared (kernel, tanpa dependensi)
+      │                 │               ▲
+      └──►  infrastructure ──────────────┘
+                  │
+              shared/ (kernel)
 ```
 
-- **domain** tidak boleh mengimpor `application`, `infrastructure`, atau `presentation`.
-- **application** hanya boleh mengimpor `domain` dan `shared`.
-- **infrastructure** mengimplementasikan kontrak `domain/repositories` & `application/ports`.
-- **presentation** memanggil use case (application), tidak memanggil `fetch` langsung.
-- **shared** adalah kernel: tipe primitif, konstanta, util murni.
+**Aturan dependensi (dalam satu fitur):**
 
-> Penamaan file: `kebab-case.ts`. Tipe/status memakai union literal (`as const`),
-> **bukan `enum`**, karena `tsconfig` memakai `erasableSyntaxOnly`.
+- `domain` tidak mengimpor apa pun selain `shared/` — tanpa React, tanpa browser API.
+- `application` hanya mengimpor `domain` (fitur sendiri) dan `shared/`.
+- `infrastructure` mengimplementasikan kontrak `domain/repositories` & `application/ports`.
+- `presentation` hanya memanggil use case dari `application` (fitur sendiri) + `shared/ui`.
+- `app` adalah composition root: merakit provider, router, layout, dan container.
+- `shared` adalah kernel bebas dependensi: tidak mengimpor `features/` maupun `app/`.
+
+**Aturan antar fitur (horizontal):**
+
+- Fitur **tidak boleh** mengimpor ke dalam lapisan fitur lain
+  (`features/donor/application/...` ❌).
+- Komunikasi antar fitur hanya lewat **public API** `features/<fitur>/index.ts` ✅.
+- Bila sebuah konsep dipakai ≥ 2 fitur dan tidak punya perilaku bisnis kaya, pindahkan ke
+  `shared/` (mis. `shared/domain/blood-type.ts`).
+- Halaman yang menggabungkan beberapa fitur (dashboard) diletakkan di `src/app/pages/`,
+  bukan di dalam salah satu fitur.
 
 ## 2. Struktur folder
 
 ```
 src/
-├─ app/                        # Composition root (bootstrap UI)
-│  ├─ App.tsx                  # root component
-│  ├─ App.css
-│  ├─ providers/               # komposisi React Context (Auth, Notification)
-│  └─ router/                  # definisi route + guard per peran
+├─ main.tsx                    # bootstrap React (StrictMode + createRoot)
 │
-├─ domain/                     # Inti bisnis, tanpa dependensi framework
-│  ├─ entities/
-│  │  ├─ user.ts               # Pengguna
-│  │  ├─ facility.ts           # Fasilitas (UTD/PMI, RS)
-│  │  ├─ blood-bag.ts          # Kantong Darah (status uji EX-01)
-│  │  ├─ blood-request.ts      # Request Darah + riwayat status
-│  │  ├─ donor.ts              # Pendonor + Riwayat Donasi
-│  │  ├─ donor-registration.ts # Pendaftaran Donor + screening + tiket QR
-│  │  ├─ donor-location.ts     # Lokasi & Jadwal Donor
-│  │  ├─ notification.ts
-│  │  └─ audit-log.ts
-│  ├─ enums/
-│  │  ├─ user.ts               # UserRole, FacilityType
-│  │  ├─ blood.ts              # golongan, rhesus, komponen, status kantong
-│  │  ├─ blood-request.ts      # status request, urgensi
-│  │  ├─ donor.ts              # status pendaftaran, hasil screening
-│  │  ├─ notification.ts
-│  │  └─ audit.ts
-│  └─ repositories/            # Kontrak akses data (interface)
+├─ app/                        # composition root — bukan fitur
+│  ├─ App.tsx                  # shell aplikasi: BrowserRouter + layout + rute
+│  ├─ container.ts             # (rencana) merakit container seluruh fitur
+│  ├─ layouts/                 # kerangka halaman lintas fitur (AuthLayout, DashboardLayout)
+│  ├─ providers/               # komposisi React Context global (Auth, DemoData)
+│  └─ router/                  # peta rute + guard per peran
 │
-├─ application/                # Use case / orkestrasi bisnis
-│  ├─ use-cases/
-│  │  ├─ auth/
-│  │  ├─ blood-stock/
-│  │  ├─ blood-request/
-│  │  ├─ donor/
-│  │  ├─ donor-location/
-│  │  └─ notification/
-│  ├─ ports/                   # Kontrak layanan eksternal
-│  │  ├─ clock-port.ts
-│  │  ├─ crypto-port.ts
-│  │  ├─ id-generator-port.ts
-│  │  ├─ notification-port.ts
-│  │  ├─ qr-code-port.ts
-│  │  └─ token-storage-port.ts
-│  └─ dto/                     # Input/Output use case
+├─ features/                   # satu folder = satu fitur bisnis
+│  ├─ auth/
+│  │  ├─ index.ts              # public API fitur — satu-satunya pintu masuk
+│  │  ├─ domain/
+│  │  ├─ application/
+│  │  ├─ infrastructure/
+│  │  └─ presentation/
+│  ├─ blood-stock/             # struktur sama dengan auth
+│  ├─ blood-request/
+│  ├─ donor/
+│  ├─ donor-location/
+│  └─ notification/
 │
-├─ infrastructure/             # Detail teknis
-│  ├─ demo/                    # fixture data contoh (tanpa backend)
-│  ├─ repositories/            # implementasi kontrak domain
-│  ├─ storage/                 # token storage
-│  └─ container.ts             # composition root
-│
-├─ presentation/               # UI
-│  ├─ pages/
-│  │  ├─ public/               # landing, lokasi & status stok (PD-01, PD-02, EX-05)
-│  │  ├─ auth/                 # login & registrasi (PD-03, AU-01, AR-01)
-│  │  ├─ donor/                # dashboard pendonor, tiket QR, riwayat (PD-04, PD-05, EX-04)
-│  │  ├─ utd/                  # portal Admin UTD/PMI (AU-01..AU-06, EX-02, EX-03)
-│  │  └─ hospital/             # portal Admin RS (AR-01..AR-06)
-│  ├─ components/{ui,shared}/
-│  ├─ layouts/
-│  ├─ hooks/
-│  ├─ contexts/
-│  ├─ utils/
-│  └─ styles/global.css
-│
-└─ shared/
-   ├─ types/common.ts          # EntityId, IsoDateTime
-   ├─ constants/{app,routes,labels}.ts
-   └─ utils/format-date.ts
+└─ shared/                     # kernel, tanpa dependensi ke features/app
+   ├─ domain/                  # value object lintas fitur (BloodType, UserRole, FacilityType)
+   ├─ types/                   # tipe primitif (EntityId, IsoDateTime, Result)
+   ├─ constants/               # konstanta aplikasi, daftar rute, label
+   ├─ utils/                   # util murni (format tanggal, dsb.)
+   ├─ ui/                      # design system: Button, TextField, Select, Badge
+   └─ styles/global.css        # design token + kelas utilitas
 ```
 
-## 3. Pemetaan fitur PRD → lapisan
+> Subfolder di dalam sebuah lapisan dibuat **saat berkas pertama ditambahkan** (agar repositori
+> tidak penuh folder kosong). Struktur di bawah adalah konvensi penempatan, bukan folder wajib.
 
-| Fitur | Domain | Application | Presentation |
-| --- | --- | --- | --- |
-| AU-02 Input kantong | `BloodBag`, `BloodBagRepository` | `use-cases/blood-stock/create-blood-bag.ts` | `pages/utd/BloodBagFormPage` |
-| AU-03 Stok & kedaluwarsa | `ExpiryStatus`, `listExpiring` | `use-cases/blood-stock/get-stock.ts` | `pages/utd/StockPage` |
-| AU-04..AU-06 Request masuk | `BloodRequest`, status history | `use-cases/blood-request/*` | `pages/utd/RequestsPage` |
-| PD-01/PD-02 Lokasi donor | `DonorLocation`, `DonorSchedule` | `use-cases/donor-location/*` | `pages/public/*` |
-| PD-03 Registrasi pendonor | `Donor` | `use-cases/auth/register-donor.ts` | `pages/auth/RegisterPage` |
-| PD-04 Screening | `HealthScreening` | `use-cases/donor/submit-screening.ts` | `pages/donor/DonorFormPage` |
-| PD-05 Tiket QR | `ticketCode` | `use-cases/donor/issue-ticket.ts` + `QrCodeService` | `pages/donor/TicketPage` |
-| AR-02 Stok real-time | `StockLevel` | `use-cases/blood-stock/get-availability.ts` | `pages/hospital/AvailabilityPage` |
-| AR-03..AR-06 Request RS | `BloodRequest` | `use-cases/blood-request/*` | `pages/hospital/*` |
-| EX-01 Status uji | `BloodTestStatus` | validasi stok | badge status di UI |
-| EX-02 Kelola lokasi/jadwal | `DonorLocation` | `use-cases/donor-location/manage-*.ts` | `pages/utd/LocationsPage` |
-| EX-03 Scan QR & daftar hadir | `DonorRegistrationStatus` | `use-cases/donor/scan-ticket.ts` | `pages/utd/ScanPage` |
-| EX-04 Interval donor | `nextEligibleAt` | `use-cases/donor/get-history.ts` | `pages/donor/HistoryPage` |
-| EX-05 Status stok publik | `StockLevel` | `use-cases/blood-stock/get-public-summary.ts` | `pages/public/HomePage` |
+## 3. Anatomi satu fitur
 
-## 4. Konvensi penting
-
-1. **Kantong layak stok** hanya `testStatus === 'passed'` dan belum kedaluwarsa (EX-01).
-2. **Reject request wajib alasan** (`rejectionReason`), transisi status mengikuti PRD §6.
-3. **Data sensitif** (NIK, hasil screening) selalu lewat `CryptoService`, tidak pernah
-   ditaruh di `localStorage`/URL.
-4. **Waktu** diambil dari port `Clock`, bukan `new Date()` di komponen.
-5. **Bahasa UI** Indonesia; format tanggal util `shared/utils/format-date.ts`.
-6. **Import** selalu memakai alias `@/...` (dikonfigurasi di `tsconfig.app.json` & `vite.config.ts`).
-
-## 5. Fitur autentikasi (sudah berjalan)
-
-### Alur
+Contoh `src/features/blood-stock/` setelah fitur diimplementasikan:
 
 ```
-UI (LoginPage / RegisterDonorPage)
-  └─ useAuth() ............ presentation/hooks/use-auth.ts
-       └─ AuthProvider .... app/providers/AuthProvider.tsx  (composition root)
-            └─ container.authUseCases
-                 ├─ LoginUseCase         → validasi → AuthRepository.login → TokenStorage.set
-                 ├─ RegisterDonorUseCase → validasi → AuthRepository.registerDonor → TokenStorage.set
-                 ├─ RestoreSessionUseCase→ TokenStorage.get → AuthRepository.fetchCurrentUser
-                 └─ LogoutUseCase        → AuthRepository.logout → TokenStorage.set(null)
+features/blood-stock/
+├─ index.ts                          # public API: ekspor use case + tipe + halaman rute
+│
+├─ domain/                           # tidak tahu React / HTTP / storage
+│  ├─ entities/blood-bag.ts          # BloodBag
+│  ├─ enums/blood.ts                 # BloodType, BloodComponent, BloodTestStatus
+│  ├─ errors/blood-bag-error.ts      # error domain spesifik fitur
+│  ├─ repositories/blood-bag-repository.ts   # interface
+│  └─ rules/stock.ts                 # isBagUsable, daysUntilExpiry, getStockLevel
+│
+├─ application/                      # orkestrasi bisnis
+│  ├─ dto/blood-bag.dto.ts           # input/output use case
+│  ├─ ports/clock-port.ts            # kontrak layanan eksternal (bila perlu)
+│  └─ use-cases/
+│     ├─ create-blood-bag.use-case.ts
+│     ├─ list-stock.use-case.ts
+│     └─ get-availability.use-case.ts
+│
+├─ infrastructure/                   # detail teknis
+│  ├─ repositories/in-memory-blood-bag-repository.ts
+│  ├─ mappers/blood-bag.mapper.ts
+│  ├─ demo/demo-blood-bags.ts        # fixture data contoh
+│  └─ container.ts                   # perakitan dependensi fitur ini
+│
+└─ presentation/                     # UI
+   ├─ pages/StockPage.tsx
+   ├─ components/StockGrid.tsx
+   ├─ hooks/use-stock.ts
+   └─ contexts/                       # hanya bila butuh state fitur
 ```
 
-### Berkas kunci
+### Tanggung jawab per lapisan
 
-| Lapisan | Berkas | Peran |
+| Lapisan | Isi | Tidak boleh |
 | --- | --- | --- |
-| Domain | `domain/repositories/auth-repository.ts` | Kontrak login/registrasi/current user (tanpa detail HTTP) |
-| Domain | `domain/errors/app-error.ts` | `AppError` + `APP_ERROR_CODES` (kode error dipakai UI) |
-| Application | `use-cases/auth/auth-validation.ts` | Validasi form murni (tanpa React), sumber pesan error field |
-| Application | `use-cases/auth/*.use-case.ts` | Orkestrasi, tidak tahu React/HTTP |
-| Application | `dto/auth.dto.ts` | `LoginInput`, `RegisterDonorInput`, `AuthenticatedUser` |
-| Application | `ports/token-storage-port.ts` | Abstraksi penyimpanan token |
-| Infrastructure | `repositories/in-memory-auth-repository.ts` | Akun demo + pendaftaran pendonor, disimpan di `sessionStorage` |
-| Infrastructure | `storage/session-token-storage.ts` | Token di `sessionStorage` (bukan `localStorage`) |
-| Infrastructure | `container.ts` | Composition root: merakit repository & use case (mock-only) |
-| Presentation | `app/router/AppRouter.tsx` | Peta rute publik + portal per peran |
-| Presentation | `app/router/guards.tsx` | `RequireAuth` (redirect + `state.from`), `RequireRole` (403) |
+| `domain` | entity, union status, error domain, interface repository, aturan bisnis murni | impor React, `window`/`localStorage`, `fetch`, library UI |
+| `application` | use case (satu kelas/fungsi = satu aksi), port, DTO | menyentuh DOM atau detail penyimpanan |
+| `infrastructure` | implementasi repository/port, mapper, fixture demo, `container.ts` | mengimpor `presentation` |
+| `presentation` | page, component, hook, context fitur | memanggil `fetch`/storage langsung, mengimpor `infrastructure` |
+| `shared` | value object lintas fitur, tipe primitif, konstanta, util, design system | mengimpor `features/` atau `app/` |
 
-### Akun demo
+## 4. Aturan impor
 
-Aplikasi ini **hanya tampilan** — tidak ada backend, tidak ada variabel `.env`, dan tidak
-ada klien HTTP. Autentikasi dijalankan oleh repository in-memory.
-
-| Peran | Email | Kata sandi |
+| Dari | Boleh mengimpor | Dilarang |
 | --- | --- | --- |
-| Admin UTD/PMI | `utd@darahterpadu.id` | `Password123!` |
-| Admin RS | `rs@darahterpadu.id` | `Password123!` |
-| Pendonor | `donor@darahterpadu.id` | `Password123!` |
+| `features/x/domain` | `shared/domain`, `shared/types` | React, `features/x/application`, `features/x/infrastructure`, fitur lain |
+| `features/x/application` | `features/x/domain`, `shared/*` | React, `features/x/infrastructure`, `features/x/presentation`, fitur lain |
+| `features/x/infrastructure` | `features/x/domain`, `features/x/application`, `shared/*` | `features/x/presentation`, fitur lain |
+| `features/x/presentation` | `features/x/domain` (tipe), `features/x/application` (use case), `shared/ui`, `shared/styles` | `features/x/infrastructure`, fitur lain |
+| `src/app` | `features/<x>` (public API), `shared/*` | path dalam lapisan fitur (`features/x/domain/...`) |
+| `shared` | hanya `shared` | `features/*`, `app/*` |
 
-Akun pendonor baru hasil registrasi disimpan di `sessionStorage` dan hilang saat tab
-ditutup — sengaja dipilih agar data contoh tidak menumpuk.
+Contoh yang benar:
 
-### Aturan rute
+```ts
+// ✅ dari halaman ke use case pada fitur yang sama
+import { listStock } from '@/features/blood-stock'
 
-| Rute | Akses |
-| --- | --- |
-| `/` | publik (landing, PD-01) |
-| `/login`, `/register` | publik; bila sudah login diarahkan ke beranda peran |
-| `/donor` | `donor` |
-| `/utd` | `utd_admin` |
-| `/rs` | `hospital_admin` |
-| `/403`, `*` | halaman status |
-
-Peran yang salah **tidak** diarahkan ke login, melainkan ke `/403`, agar pengguna tidak
-kehilangan sesi hanya karena salah tautan.
-
-## 6. Data contoh (mode tampilan)
-
-Karena aplikasi belum memakai backend, isi portal berasal dari fixture di
-`src/infrastructure/demo/`.
-
-```
-infrastructure/demo/
-├─ demo-clock.ts ............ fromNowDays()/dateInDays() agar tanggal selalu relatif hari ini
-├─ demo-blood-bags.ts ....... 15 kantong (campur tersedia, mendekati kedaluwarsa, reaktif, kedaluwarsa)
-├─ demo-blood-requests.ts ... 4 permintaan RS (menunggu, disetujui, ditolak, diterima)
-├─ demo-donors.ts ........... profil pendonor, 3 riwayat donasi, 1 tiket aktif
-├─ demo-locations.ts ........ 2 lokasi + jadwal layanan
-└─ index.ts ................. barrel
+// ✅ dari fitur lain lewat public API
+import { restoreSession } from '@/features/auth'
 ```
 
-### Alur data
+Contoh yang salah:
+
+```ts
+// ❌ menembus lapisan & batas fitur
+import { InMemoryBloodBagRepository } from '@/features/blood-stock/infrastructure/repositories/in-memory-blood-bag-repository'
+
+// ❌ presentation bergantung pada implementasi
+import { bloodBagRepository } from '@/features/blood-stock/infrastructure/container'
+```
+
+## 5. Pemetaan fitur PRD → feature slice
+
+| ID | Fitur PRD | Feature slice | Application (use case) | Presentation |
+| --- | --- | --- | --- | --- |
+| AU-01 | Login pengguna | `auth` | `login.use-case` | `pages/LoginPage` |
+| PD-03 | Registrasi pendonor | `auth` | `register-donor.use-case` | `pages/RegisterDonorPage` |
+| AU-02 | Input kantong darah | `blood-stock` | `create-blood-bag.use-case` | `pages/utd/BloodBagFormPage` |
+| AU-03, EX-01 | Stok & kedaluwarsa | `blood-stock` | `list-stock.use-case` | `pages/utd/StockPage` |
+| AR-02, EX-05 | Ketersediaan stok | `blood-stock` | `get-availability.use-case` | `pages/hospital/AvailabilityPage`, `pages/public/HomePage` |
+| AU-04..AU-06 | Request masuk UTD | `blood-request` | `verify-request.use-case`, `reject-request.use-case` | `pages/utd/RequestsPage` |
+| AR-03..AR-06 | Pengajuan request RS | `blood-request` | `create-request.use-case`, `list-requests.use-case` | `pages/hospital/*` |
+| PD-04 | Screening kesehatan | `donor` | `submit-screening.use-case` | `pages/donor/ScreeningPage` |
+| PD-05, EX-03 | Tiket QR & daftar hadir | `donor` | `issue-ticket.use-case`, `scan-ticket.use-case` | `pages/donor/TicketPage`, `pages/utd/ScanPage` |
+| EX-04 | Interval & riwayat donor | `donor` | `get-donation-history.use-case` | `pages/donor/HistoryPage` |
+| PD-01, PD-02 | Lokasi & jadwal donor | `donor-location` | `list-locations.use-case`, `list-schedules.use-case` | `pages/public/LocationsPage` |
+| EX-02 | Kelola lokasi/jadwal | `donor-location` | `create-location.use-case`, `update-schedule.use-case` | `pages/utd/LocationsPage` |
+| — | Notifikasi status | `notification` | `notify-request-status.use-case` | `components/NotificationBell` |
+
+## 6. Composition root & wiring
+
+Dependensi nyata dirakit di luar lapisan domain/application, dari bawah ke atas:
 
 ```
-infrastructure/demo/*  (fixture)
-  └─ DemoDataProvider ... app/providers/DemoDataProvider.tsx
-       └─ useDemoData() . presentation/hooks/use-demo-data.ts
-            └─ UtdDashboardPage / HospitalDashboardPage / DonorDashboardPage / LandingPage
+features/<fitur>/infrastructure/container.ts   # rakit repository + use case fitur
+        │
+        ▼
+src/app/container.ts                           # gabungkan container tiap fitur
+        │
+        ▼
+src/app/providers/*                            # masukkan ke React Context
+        │
+        ▼
+features/<fitur>/presentation/hooks/*          # konsumsi lewat hook
+        │
+        ▼
+features/<fitur>/presentation/pages/*          # render UI
 ```
 
-Perhitungan turunan tidak disimpan di fixture, melainkan dihitung lewat aturan domain:
+- `presentation` **tidak pernah** menyusun dependensi sendiri; ia menerima use case dari hook.
+- Saat backend tersedia: tambahkan `infrastructure/repositories/http-*.ts` pada fitur terkait,
+  lalu tukar implementasinya di `container.ts` fitur tersebut. Lapisan lain tidak berubah.
+- `src/app/router/AppRouter.tsx` memetakan rute ke halaman yang diekspor `features/<x>/index.ts`;
+  guard per peran ada di `src/app/router/guards.tsx`.
 
-| Aturan | Berkas | Dipakai untuk |
-| --- | --- | --- |
-| `isBagUsable` | `domain/rules/stock.ts` | stok hanya dari kantong lolos uji & belum kedaluwarsa (EX-01) |
-| `daysUntilExpiry` / `isNearExpiry` | `domain/rules/stock.ts` | penanda kedaluwarsa ≤ 7 hari (AU-03) |
-| `getStockLevel` / `summarizeStockByBloodType` | `domain/rules/stock.ts` | status Aman/Menipis/Kritis per golongan (AR-02, EX-05) |
-| `stockLevelTone` dkk. | `presentation/utils/badges.ts` | warna `StatusBadge` |
+## 7. Konvensi teknis
 
-`application/use-cases/*` dan `application/ports/*` (clock, crypto, id-generator,
-notification, qr-code) sengaja dibiarkan sebagai kerangka: saat backend tersedia, halaman
-tinggal diarahkan ke use case tanpa mengubah lapisan domain.
+1. **Nama berkas** `kebab-case.ts`. Komponen React tetap `PascalCase` untuk nama ekspor.
+2. **Tanpa `enum`** — `tsconfig` memakai `erasableSyntaxOnly`; gunakan `as const` + union type.
 
-## 7. Langkah berikutnya
+   ```ts
+   export const BLOOD_TYPES = ['A', 'B', 'AB', 'O'] as const
+   export type BloodType = (typeof BLOOD_TYPES)[number]
+   ```
 
-- Implementasi modul stok darah (AU-02, AU-03, EX-01) dan permintaan (AU-04..AU-06, AR-02..AR-06).
-- Tambah `domain/rules` untuk transisi status permintaan saat alur verifikasi disepakati.
-- Saat backend siap: buat `infrastructure/repositories/http-*.ts` yang mengimplementasikan
-  kontrak di `domain/repositories/`, lalu tukar implementasinya di `container.ts`.
-  Lapisan presentation tidak perlu diubah karena hanya bergantung pada use case.
+3. **`import type`** untuk semua impor tipe (`verbatimModuleSyntax`).
+4. **Alias impor** `@/*` → `src/*` (dikonfigurasi di `tsconfig.app.json` dan `vite.config.ts`).
+5. **Waktu** diambil dari port `Clock`, bukan `new Date()` di komponen (agar bisa diuji & stabil).
+6. **Data sensitif** (NIK, hasil screening) hanya lewat `CryptoPort`, tidak pernah di `localStorage`
+   atau URL.
+7. **Styling**: satu berkas `shared/styles/global.css`, kelas BEM-ish, tanpa CSS module/framework.
+8. **Bahasa UI** Indonesia; format tanggal lewat `shared/utils/format-date.ts`.
+9. **Aturan bisnis** ditulis sebagai fungsi murni di `domain/rules/` agar bisa diuji tanpa React.
 
+## 8. Status & langkah berikutnya
+
+Sudah ada:
+
+- `src/main.tsx` — bootstrap React + impor `@/shared/styles/global.css`.
+- `src/app/App.tsx` — shell (header/nav/footer), `BrowserRouter`, rute `/` dan `/status`.
+- `src/shared/styles/global.css` — design token + kelas dasar.
+- `src/features/<fitur>/index.ts` — public API kosong sebagai penanda batas fitur.
+- Folder `app/`, `features/*/{domain,application,infrastructure,presentation}`, `shared/*`
+  dengan `.gitkeep`.
+
+Langkah berikutnya yang disarankan:
+
+1. **`auth`** — entity `User`, `AuthRepository`, `login`/`logout`/`restore-session` use case,
+   `in-memory-auth-repository` + fixture akun demo, `AuthProvider`, `LoginPage`.
+2. **`app`** — `container.ts`, `router/AppRouter.tsx`, `router/guards.tsx`, `layouts/*`.
+3. **`shared`** — `domain/blood-type.ts`, `types/common.ts`, `constants/routes.ts`,
+   `utils/format-date.ts`, `ui/*` (Button, TextField, Select, Badge).
+4. **`blood-stock`** → **`blood-request`** → **`donor`** → **`donor-location`** →
+   **`notification`**, mengikuti urutan pada tabel §5.
