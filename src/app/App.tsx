@@ -1,4 +1,6 @@
-import { BrowserRouter, Link, NavLink, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Link, Route, Routes } from 'react-router-dom'
+
+import { LandingPage } from '@/features/landing-page/presentation/pages/LandingPage'
 
 /**
  * Composition root UI.
@@ -6,11 +8,6 @@ import { BrowserRouter, Link, NavLink, Route, Routes } from 'react-router-dom'
  * Halaman nyata diletakkan per fitur di
  * `src/features/<fitur>/presentation/pages/*` dan dipetakan di `src/app/router/*`.
  */
-
-const NAV_ITEMS = [
-  { to: '/', label: 'Beranda', end: true },
-  { to: '/status', label: 'Status Arsitektur', end: false },
-] as const
 
 const FEATURE_LAYERS = [
   {
@@ -78,63 +75,44 @@ const SHARED = [
   { name: 'styles', desc: 'global.css (design token & utilitas kelas).' },
 ] as const
 
-function HomePage() {
-  return (
-    <section className="panel panel--hero">
-      <p className="eyebrow">Platform Donor Darah Terpadu</p>
-      <h1>DarahTerpadu</h1>
-      <p className="lead">
-        Menghubungkan UTD/PMI, rumah sakit, dan pendonor dalam satu alur: stok darah,
-        permintaan, jadwal donor, dan tiket QR.
-      </p>
-      <p className="muted">
-        Status: <strong>kerangka arsitektur</strong> — antarmuka fitur belum diimplementasikan.
-      </p>
-      <Link className="button" to="/status">
-        Lihat status arsitektur
-      </Link>
-    </section>
-  )
-}
-
 function ArchitectureStatusPage() {
   return (
-    <section className="panel">
-      <h2>Feature-based Clean Architecture</h2>
-      <p className="muted">
+    <section className="rounded-2xl border border-[#e3dedb] bg-white p-8 shadow-sm">
+      <h2 className="mb-2 text-2xl font-bold">Feature-based Clean Architecture</h2>
+      <p className="text-[#6b6461]">
         Kode dipecah per <strong>fitur</strong>, dan setiap fitur memiliki empat lapisan clean
         architecture. Aturan dependensi di dalam fitur:{' '}
         <code>presentation → application → domain</code>. Lapisan <code>infrastructure</code>{' '}
         mengimplementasikan kontrak milik <code>domain</code> dan <code>application</code>.
       </p>
 
-      <h3>Lapisan per fitur</h3>
-      <ul className="layer-list">
+      <h3 className="mt-6 text-lg font-bold">Lapisan per fitur</h3>
+      <ul className="mt-4 grid list-none gap-2 p-0">
         {FEATURE_LAYERS.map((layer) => (
-          <li className="layer-item" key={layer.name}>
-            <code>features/&lt;fitur&gt;/{layer.name}</code>
-            <span>{layer.desc}</span>
+          <li className="flex flex-wrap items-baseline gap-x-4 gap-y-1 rounded-xl border border-[#e3dedb] bg-[#faf8f7] p-3 text-sm" key={layer.name}>
+            <code className="rounded-lg bg-[#f0ebe9] px-1.5 py-0.5 font-mono text-xs">features/&lt;fitur&gt;/{layer.name}</code>
+            <span className="flex-1 text-[#6b6461]">{layer.desc}</span>
           </li>
         ))}
       </ul>
 
-      <h3>Feature slice (sesuai modul PRD)</h3>
-      <ul className="layer-list">
+      <h3 className="mt-6 text-lg font-bold">Feature slice (sesuai modul PRD)</h3>
+      <ul className="mt-4 grid list-none gap-2 p-0">
         {FEATURES.map((feature) => (
-          <li className="layer-item" key={feature.name}>
-            <code>features/{feature.name}</code>
-            <span>{feature.desc}</span>
-            <span className="prd-ref">{feature.prd}</span>
+          <li className="flex flex-wrap items-baseline gap-x-4 gap-y-1 rounded-xl border border-[#e3dedb] bg-[#faf8f7] p-3 text-sm" key={feature.name}>
+            <code className="rounded-lg bg-[#f0ebe9] px-1.5 py-0.5 font-mono text-xs">features/{feature.name}</code>
+            <span className="flex-1 text-[#6b6461]">{feature.desc}</span>
+            <span className="rounded-full bg-[#fbe9e7] px-2 py-0.5 text-xs font-bold text-[#8c1d17]">{feature.prd}</span>
           </li>
         ))}
       </ul>
 
-      <h3>Shared kernel</h3>
-      <ul className="layer-list">
+      <h3 className="mt-6 text-lg font-bold">Shared kernel</h3>
+      <ul className="mt-4 grid list-none gap-2 p-0">
         {SHARED.map((item) => (
-          <li className="layer-item" key={item.name}>
-            <code>shared/{item.name}</code>
-            <span>{item.desc}</span>
+          <li className="flex flex-wrap items-baseline gap-x-4 gap-y-1 rounded-xl border border-[#e3dedb] bg-[#faf8f7] p-3 text-sm" key={item.name}>
+            <code className="rounded-lg bg-[#f0ebe9] px-1.5 py-0.5 font-mono text-xs">shared/{item.name}</code>
+            <span className="flex-1 text-[#6b6461]">{item.desc}</span>
           </li>
         ))}
       </ul>
@@ -144,10 +122,10 @@ function ArchitectureStatusPage() {
 
 function NotFoundPage() {
   return (
-    <section className="panel">
-      <h2>404 — Halaman tidak ditemukan</h2>
-      <p className="muted">Rute yang Anda tuju belum tersedia.</p>
-      <Link className="button" to="/">
+    <section className="rounded-2xl border border-[#e3dedb] bg-white p-8 shadow-sm">
+      <h2 className="mb-2 text-2xl font-bold">404 — Halaman tidak ditemukan</h2>
+      <p className="text-[#6b6461]">Rute yang Anda tuju belum tersedia.</p>
+      <Link className="mt-2 inline-flex items-center justify-center rounded-lg bg-[#b3261e] px-5 py-2.5 font-semibold text-white no-underline hover:bg-[#8c1d17]" to="/">
         Kembali ke beranda
       </Link>
     </section>
@@ -156,39 +134,29 @@ function NotFoundPage() {
 
 function AppShell() {
   return (
-    <div className="app">
-      <header className="app-header">
-        <Link className="brand" to="/">
-          <span className="brand__mark" aria-hidden="true">
-            DT
-          </span>
-          <span className="brand__name">DarahTerpadu</span>
-        </Link>
-        <nav className="app-nav" aria-label="Navigasi utama">
-          {NAV_ITEMS.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end={item.end}
-              className={({ isActive }) => (isActive ? 'app-nav__link is-active' : 'app-nav__link')}
-            >
-              {item.label}
-            </NavLink>
-          ))}
-        </nav>
-      </header>
-
-      <main className="app-main">
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/status" element={<ArchitectureStatusPage />} />
-          <Route path="*" element={<NotFoundPage />} />
-        </Routes>
-      </main>
-
-      <footer className="app-footer">
+    <div className="flex min-h-screen flex-col bg-[#f7f5f4]">
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route
+          path="/status"
+          element={
+            <main className="mx-auto w-full max-w-[960px] flex-1 px-4 py-12 sm:px-8">
+              <ArchitectureStatusPage />
+            </main>
+          }
+        />
+        <Route
+          path="*"
+          element={
+            <main className="mx-auto w-full max-w-[960px] flex-1 px-4 py-12 sm:px-8">
+              <NotFoundPage />
+            </main>
+          }
+        />
+      </Routes>
+      <footer className="flex flex-wrap justify-between gap-2 border-t border-[#e3dedb] bg-white px-4 py-4 text-sm sm:px-8">
         <span>DarahTerpadu &copy; 2026</span>
-        <span className="muted">Demo tanpa backend — data akan berasal dari fixture.</span>
+        <span className="text-[#6b6461]">Membangun akses darah yang lebih baik untuk semua.</span>
       </footer>
     </div>
   )
