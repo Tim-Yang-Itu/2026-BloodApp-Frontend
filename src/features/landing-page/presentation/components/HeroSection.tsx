@@ -16,10 +16,10 @@ export function HeroSection() {
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
           <Link className={`${button} bg-primary text-on-primary hover:bg-primary-hover`} to="/register">Mulai berdonor</Link>
-          <a className={`${button} border border-primary text-primary hover:bg-primary-soft`} href="#cara-kerja">Cari Lokasi Donor</a>
+          <Link className={`${button} border border-primary text-primary hover:bg-primary-soft`} to="/#lokasi-donor">Cari Lokasi Donor</Link>
         </div>
       </div>
-      <div className="relative grid min-h-[390px] place-items-center max-lg:mx-auto max-lg:w-full">
+      <div className="relative grid min-h-[390px] place-items-center max-lg:mx-auto max-lg:w-full hidden lg:block">
         <div className="hero-orb grid aspect-square w-[min(360px,75vw)] rotate-[-7deg] place-items-center rounded-full shadow-hero">
           <span className="grid h-[150px] w-[115px] rotate-45 place-items-center rounded-[60%_60%_60%_10%] bg-primary text-[2.8rem] text-on-primary shadow-heart" aria-hidden="true">♥</span>
         </div>

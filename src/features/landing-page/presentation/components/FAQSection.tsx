@@ -26,8 +26,8 @@ const eyebrow = "text-xs font-bold uppercase tracking-[0.14em] text-primary";
 export function FAQSection() {
   return (
     <section
-      className="mx-auto w-[calc(100%-3rem)] max-w-[1180px] py-8 pb-20"
-      id="cara-kerja"
+      className="mx-auto w-[calc(100%-3rem)] max-w-[1180px] scroll-mt-24 py-8 pb-20"
+      id="faq"
     >
       <div className="mb-10 max-w-[600px]">
         <p className={eyebrow}>FAQ</p>

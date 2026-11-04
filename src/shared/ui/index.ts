@@ -1,6 +1,8 @@
 export { Button } from './Button'
 export type { ButtonVariant } from './Button'
 export { PasswordField } from './PasswordField'
+export { PublicNavbar } from './PublicNavbar'
+export type { PublicNavKey } from './PublicNavbar'
 export { SelectField } from './SelectField'
 export type { SelectOption } from './SelectField'
 export { TextField } from './TextField'

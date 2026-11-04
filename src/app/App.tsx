@@ -1,7 +1,14 @@
 import { BrowserRouter, Link, Route, Routes } from 'react-router-dom'
 
+import {
+  DonorLocationDetailPage,
+  DonorLocationProvider,
+  DonorLocationsPage,
+} from '@/features/donor-location'
 import { LoginPage, RegisterPage } from '@/features/auth'
 import { LandingPage } from '@/features/landing-page/presentation/pages/LandingPage'
+
+import { container } from './container'
 
 /**
  * Composition root UI.
@@ -152,6 +159,24 @@ function PublicShell() {
     <div className="flex min-h-screen flex-col bg-surface-sunken">
       <Routes>
         <Route path="/" element={<LandingPage />} />
+        {/* PDN-02: eksplorasi lokasi donor, terbuka tanpa login */}
+        <Route
+          path="/lokasi-donor"
+          element={
+            <DonorLocationProvider useCases={container.donorLocation}>
+              <DonorLocationsPage />
+            </DonorLocationProvider>
+          }
+        />
+        {/* PDN-03: detail lokasi + pemilihan jadwal */}
+        <Route
+          path="/lokasi-donor/:locationId"
+          element={
+            <DonorLocationProvider useCases={container.donorLocation}>
+              <DonorLocationDetailPage />
+            </DonorLocationProvider>
+          }
+        />
         <Route
           path="/status"
           element={
@@ -170,7 +195,7 @@ function PublicShell() {
         />
       </Routes>
       <footer className="flex flex-wrap justify-between gap-2 border-t border-border bg-surface px-4 py-4 text-sm sm:px-8">
-        <span>DarahTerpadu &copy; 2026</span>
+        <span>DonorKu &copy; 2026</span>
         <span className="text-muted">Membangun akses darah yang lebih baik untuk semua.</span>
       </footer>
     </div>

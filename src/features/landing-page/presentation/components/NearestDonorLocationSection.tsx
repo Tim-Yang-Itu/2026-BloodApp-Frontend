@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 const STEPS = [
   {
     number: "01",
+    id: "utd-pmi-surabaya",
     tempat: "UTD PMI",
     title: "UTD PMI Kota Surabaya",
     address: "Jl. Raya Darmo No. 2, Surabaya",
@@ -11,6 +12,7 @@ const STEPS = [
   },
   {
     number: "02",
+    id: "rs-harapan-sehat",
     tempat: "RUMAH SAKIT",
     title: "RS Harapan Sehat",
     address: "Jl. Raya Darmo No. 2, Surabaya",
@@ -19,6 +21,7 @@ const STEPS = [
   },
   {
     number: "03",
+    id: "mobil-donor-balai-kota",
     tempat: "MOBIL DONOR",
     title: "Mobil Donor Balai Kota",
     address: "Jl. Raya Darmo No. 2, Surabaya",
@@ -30,21 +33,31 @@ const STEPS = [
 const button =
   "inline-flex max-h-20 max-w-40  rounded-lg mt-5 text-sm font-semibold no-underline transition-colors";
 
+const eyebrow = "text-xs font-bold uppercase tracking-[0.14em] text-primary";
+
 export function NearestDonorLocationSection() {
   return (
     <section
-      className="mx-auto w-[calc(100%-3rem)] max-w-[1180px] py-8 pb-20"
-      id="cara-kerja"
+      className="mx-auto w-[calc(100%-3rem)] max-w-[1180px] scroll-mt-24 py-8 pb-20"
+      id="lokasi-donor"
     >
-      <div className="flex justify-between items-center mb-5">
-        <h2 className="my-2 text-[clamp(2rem,4vw,3rem)] font-bold tracking-[-0.015em] text-heading">
-          Lokasi Donor Terdekat
-        </h2>
-        <a href="/all-location">
-          <p className="text-xs font-bold uppercase tracking-[0.14em] text-primary cursor-pointer">
-            Lihat Semua Lokasi
+      <div className="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+        <div className="max-w-[600px]">
+          <p className={eyebrow}>Lokasi donor</p>
+          <h2 className="my-2 text-[clamp(2rem,4vw,3rem)] font-bold tracking-[-0.015em] text-heading">
+            Lokasi Donor Terdekat
+          </h2>
+          <p className="m-0 text-muted">
+            Temukan tempat donor di sekitarmu. Cek jadwal dan sisa kuota, lalu pilih waktu yang
+            paling cocok.
           </p>
-        </a>
+        </div>
+        <Link
+          className="shrink-0 text-xs font-bold uppercase tracking-[0.14em] text-primary no-underline hover:underline md:mb-2"
+          to="/lokasi-donor"
+        >
+          Lihat Semua Lokasi
+        </Link>
       </div>
       <div className="grid gap-5 md:grid-cols-3">
         {STEPS.map((step) => (
@@ -71,7 +84,7 @@ export function NearestDonorLocationSection() {
               </div>
               <Link
                 className={`${button} bg-transparent text-primary hover:text-primary-hover`}
-                to="/detail-location"
+                to={`/lokasi-donor/${step.id}`}
               >
                 Lihat Detail
               </Link>

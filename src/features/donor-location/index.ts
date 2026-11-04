@@ -10,9 +10,29 @@
  * Catatan: halaman landing PDN-01 tidak berada di fitur ini karena menggabungkan
  * beberapa fitur (stok + lokasi) sehingga diletakkan di `src/app/pages/public/`.
  *
- * Rencana ekspor:
- * - use case: listLocations, getLocationDetail, listSchedules,
- *             createLocation, updateLocation, publishSchedule
- * - tipe publik: DonorLocation, DonorSchedule, LocationFilter
+ * Pemakaian dari `src/app`:
+ *
+ * ```tsx
+ * const donorLocation = createDonorLocationModule()
+ *
+ * <DonorLocationProvider useCases={donorLocation}>
+ *   <DonorLocationsPage />
+ * </DonorLocationProvider>
+ * ```
  */
-export {}
+export { createDonorLocationModule } from './infrastructure/container'
+export type { DonorLocationModule } from './infrastructure/container'
+
+export type {
+  ListLocationsResult,
+  LocationDetailDto,
+  LocationFilterInput,
+  LocationSummaryDto,
+  ScheduleDayDto,
+  TimeSlotDto,
+} from './application/dto/donor-location.dto'
+
+export { DonorLocationProvider } from './presentation/contexts/donor-location-context'
+export type { DonorLocationUseCases } from './presentation/contexts/donor-location-context'
+export { DonorLocationDetailPage } from './presentation/pages/DonorLocationDetailPage'
+export { DonorLocationsPage } from './presentation/pages/DonorLocationsPage'

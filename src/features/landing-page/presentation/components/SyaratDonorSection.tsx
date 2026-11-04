@@ -26,13 +26,13 @@ const eyebrow = "text-xs font-bold uppercase tracking-[0.14em] text-primary";
 export function SyaratDonorSection() {
   return (
     <section
-      className="mx-auto w-[calc(100%-3rem)] max-w-[1180px] py-8 pb-20"
+      className="mx-auto w-[calc(100%-3rem)] max-w-[1180px] scroll-mt-24 py-8 pb-20"
       id="syarat"
     >
       <div className="mb-10 max-w-[600px]">
-        <p className={eyebrow}>Cara kerja</p>
+        <p className={eyebrow}>Syarat donor</p>
         <h2 className="my-2 text-[clamp(2rem,4vw,3rem)] font-bold tracking-[-0.015em] text-heading">
-          Cara Donor di DonorKu
+          Syarat Donor di DonorKu
         </h2>
       </div>
       <div className="grid gap-5 md:grid-cols-2">
