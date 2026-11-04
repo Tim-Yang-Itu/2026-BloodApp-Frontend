@@ -1,3 +1,4 @@
+import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const STEPS = [
@@ -35,6 +36,9 @@ const button =
 
 const eyebrow = "text-xs font-bold uppercase tracking-[0.14em] text-primary";
 
+const allLocationsLink =
+  "group inline-flex shrink-0 items-center justify-center gap-2 self-start rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-on-primary no-underline shadow-sm transition-all hover:-translate-y-0.5 hover:bg-primary-hover hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary md:mb-3 md:self-auto";
+
 export function NearestDonorLocationSection() {
   return (
     <section
@@ -52,11 +56,12 @@ export function NearestDonorLocationSection() {
             paling cocok.
           </p>
         </div>
-        <Link
-          className="shrink-0 text-xs font-bold uppercase tracking-[0.14em] text-primary no-underline hover:underline md:mb-2"
-          to="/lokasi-donor"
-        >
+        <Link className={allLocationsLink} to="/lokasi-donor">
           Lihat Semua Lokasi
+          <ArrowRight
+            aria-hidden="true"
+            className="size-4 transition-transform group-hover:translate-x-0.5"
+          />
         </Link>
       </div>
       <div className="grid gap-5 md:grid-cols-3">
