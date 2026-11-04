@@ -1,11 +1,14 @@
 import type { FormEvent } from 'react'
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom'
 
 import { Button, SelectField, TextField } from '@/shared/ui'
 
+import { authErrorMessage } from '../../domain/errors/auth-error'
+import { roleHomePath, safeRedirectPath } from '../../domain/rules/role-home'
 import { AuthSplitLayout } from '../components/AuthSplitLayout'
 import { AuthTabs } from '../components/AuthTabs'
+import { useAuth } from '../hooks/use-auth'
 
 type RegisterFormValues = {
   fullName: string
@@ -51,21 +54,55 @@ const RHESUS_OPTIONS = [
 
 /**
  * Halaman registrasi pendonor (PDN-04).
- * Integrasi use case `registerDonor` belum tersedia, jadi submit hanya
- * memvalidasi form di sisi klien.
+ * Akun langsung dipakai untuk sesi berjalan, jadi pengguna tidak perlu
+ * login dua kali setelah mendaftar.
  */
 export function RegisterPage() {
+  const { user, isReady, registerDonor } = useAuth()
+  const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+
+  const redirectParam = searchParams.get('redirect')
+  const loginHref = redirectParam
+    ? `/login?redirect=${encodeURIComponent(redirectParam)}`
+    : '/login'
+
   const [values, setValues] = useState<RegisterFormValues>(INITIAL_VALUES)
-  const [isSubmitted, setIsSubmitted] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   function updateField<K extends keyof RegisterFormValues>(field: K, value: RegisterFormValues[K]) {
     setValues((previous) => ({ ...previous, [field]: value }))
-    setIsSubmitted(false)
+    setError(null)
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    setIsSubmitted(true)
+    setError(null)
+    setIsSubmitting(true)
+
+    try {
+      const created = await registerDonor({
+        fullName: values.fullName,
+        email: values.email,
+        phone: values.phone,
+        birthDate: values.birthDate,
+        gender: values.gender === 'female' ? 'female' : 'male',
+        bloodType: values.bloodType === '' ? null : values.bloodType,
+        rhesus: values.rhesus === '' ? null : values.rhesus,
+        password: values.password,
+      })
+
+      navigate(safeRedirectPath(redirectParam, roleHomePath(created.role)), { replace: true })
+    } catch (caught) {
+      setError(authErrorMessage(caught))
+      setIsSubmitting(false)
+    }
+  }
+
+  // Sudah login: jangan tampilkan form pendaftaran lagi.
+  if (isReady && user) {
+    return <Navigate replace to={safeRedirectPath(redirectParam, roleHomePath(user.role))} />
   }
 
   return (
@@ -180,24 +217,24 @@ export function RegisterPage() {
           value={values.password}
         />
 
-        <Button className="mt-2" fullWidth type="submit">
-          Daftar dan dapatkan akses akun
+        <Button className="mt-2" disabled={isSubmitting} fullWidth type="submit">
+          {isSubmitting ? 'Membuat akun…' : 'Daftar dan dapatkan akses akun'}
         </Button>
 
-        {isSubmitted ? (
+        {error ? (
           <p
             aria-live="polite"
-            className="rounded-lg border border-primary-200 bg-primary-50 px-4 py-3 text-xs leading-relaxed text-primary-800"
+            className="rounded-lg border border-danger/30 bg-danger/5 px-4 py-3 text-xs leading-relaxed text-danger"
+            role="alert"
           >
-            Data form sudah valid. Integrasi API registrasi pendonor (PDN-04) belum aktif, jadi
-            akun belum benar-benar dibuat.
+            {error}
           </p>
         ) : null}
       </form>
 
       <p className="mt-6 text-center text-xs text-muted">
         Sudah punya akun?{' '}
-        <Link className="font-semibold text-primary hover:underline" to="/login">
+        <Link className="font-semibold text-primary hover:underline" to={loginHref}>
           Masuk di sini
         </Link>
         .

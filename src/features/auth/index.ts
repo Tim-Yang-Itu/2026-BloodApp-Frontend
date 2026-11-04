@@ -12,8 +12,20 @@
  * Rencana ekspor:
  * - use case: login, logout, registerDonor, restoreSession
  * - tipe publik: AuthenticatedUser, UserRole, LoginInput, RegisterDonorInput
- * - aplikasi/infrastruktur: belum tersedia
  */
+
+export { createAuthModule } from './infrastructure/container'
+export type { AuthModule } from './infrastructure/container'
+
+export type { LoginInput, RegisterDonorInput } from './application/dto/auth.dto'
+export type { AuthUser, DonorProfile, UserRole } from './domain/entities/user'
+export { initialsOf, shortNameOf } from './domain/entities/user'
+export { authErrorMessage } from './domain/errors/auth-error'
+export { roleHomePath, safeRedirectPath } from './domain/rules/role-home'
+
+export { AuthProvider } from './presentation/contexts/AuthProvider'
+export { useAuth } from './presentation/hooks/use-auth'
+export { RequireAuth } from './presentation/components/RequireAuth'
 export { AuthSplitLayout } from './presentation/components/AuthSplitLayout'
 export { AuthTabs } from './presentation/components/AuthTabs'
 export type { AuthTab } from './presentation/components/AuthTabs'

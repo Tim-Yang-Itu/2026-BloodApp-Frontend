@@ -1,4 +1,6 @@
+import { createAuthModule } from '@/features/auth'
 import { createDonorLocationModule } from '@/features/donor-location'
+import { createDonorRegistrationModule } from '@/features/donor-registration'
 
 /**
  * Composition root seluruh fitur.
@@ -10,7 +12,9 @@ import { createDonorLocationModule } from '@/features/donor-location'
  * Menambah fitur baru = menambah satu baris di sini.
  */
 export const container = {
+  auth: createAuthModule(),
   donorLocation: createDonorLocationModule(),
+  donorRegistration: createDonorRegistrationModule(),
 }
 
 export type AppContainer = typeof container

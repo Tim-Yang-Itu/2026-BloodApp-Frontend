@@ -35,4 +35,5 @@ export type {
 export { DonorLocationProvider } from './presentation/contexts/donor-location-context'
 export type { DonorLocationUseCases } from './presentation/contexts/donor-location-context'
 export { DonorLocationDetailPage } from './presentation/pages/DonorLocationDetailPage'
+export type { DonorScheduleSelection } from './presentation/pages/DonorLocationDetailPage'
 export { DonorLocationsPage } from './presentation/pages/DonorLocationsPage'
