@@ -37,7 +37,7 @@ export function AuthSplitLayout({ headline, description, aside, children }: Auth
             <span className="grid size-8 place-items-center rounded-full bg-surface text-primary">
               <DropMark />
             </span>
-            <span className="text-lg font-bold tracking-tight">DarahTerpadu</span>
+            <span className="text-lg font-bold tracking-tight">DonorKu</span>
           </Link>
 
           <div className="max-w-md">

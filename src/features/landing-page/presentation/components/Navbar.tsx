@@ -8,6 +8,14 @@ const NAV_LINKS = [
   { href: '#faq', label: 'FAQ' },
 ] as const
 
+function DropMark() {
+  return (
+    <svg aria-hidden="true" className="size-4" fill="currentColor" viewBox="0 0 24 24">
+      <path d="M12 2.4c3.2 4.1 6.6 8 6.6 11.6a6.6 6.6 0 1 1-13.2 0C5.4 10.4 8.8 6.5 12 2.4Z" />
+    </svg>
+  )
+}
+
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const closeMenu = () => setIsMenuOpen(false)
@@ -17,9 +25,9 @@ export function Navbar() {
       <div className="mx-auto flex min-h-[76px] max-w-[1180px] items-center justify-between px-6">
         <Link className="inline-flex items-center gap-2.5 text-foreground no-underline" to="/" onClick={closeMenu}>
           <span className="grid size-9 place-items-center rounded-full bg-primary text-xs font-bold tracking-wide text-on-primary">
-            DT
+            <DropMark />
           </span>
-          <span className="text-[1.05rem] font-bold">DarahTerpadu</span>
+          <span className="text-[1.05rem] font-bold">DonorKu</span>
         </Link>
 
         <button
