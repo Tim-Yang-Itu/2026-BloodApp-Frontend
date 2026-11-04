@@ -12,6 +12,10 @@
  * Rencana ekspor:
  * - use case: login, logout, registerDonor, restoreSession
  * - tipe publik: AuthenticatedUser, UserRole, LoginInput, RegisterDonorInput
- * - kontrak: AuthRepository, TokenStoragePort
+ * - aplikasi/infrastruktur: belum tersedia
  */
-export {}
+export { AuthSplitLayout } from './presentation/components/AuthSplitLayout'
+export { AuthTabs } from './presentation/components/AuthTabs'
+export type { AuthTab } from './presentation/components/AuthTabs'
+export { LoginPage } from './presentation/pages/LoginPage'
+export { RegisterPage } from './presentation/pages/RegisterPage'

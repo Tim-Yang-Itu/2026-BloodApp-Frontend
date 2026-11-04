@@ -1,5 +1,6 @@
 import { BrowserRouter, Link, Route, Routes } from 'react-router-dom'
 
+import { LoginPage, RegisterPage } from '@/features/auth'
 import { LandingPage } from '@/features/landing-page/presentation/pages/LandingPage'
 
 /**
@@ -72,14 +73,17 @@ const SHARED = [
   { name: 'constants', desc: 'Konstanta aplikasi, daftar rute, label.' },
   { name: 'utils', desc: 'Util murni: format tanggal, dsb.' },
   { name: 'ui', desc: 'Design system: Button, TextField, Select, Badge.' },
-  { name: 'styles', desc: 'global.css (design token & utilitas kelas).' },
+  {
+    name: 'styles',
+    desc: 'global.css — @config tailwind.config.js, base layer (font Fustat/Fraunces) + utilitas dekoratif.',
+  },
 ] as const
 
 function ArchitectureStatusPage() {
   return (
-    <section className="rounded-2xl border border-[#e3dedb] bg-white p-8 shadow-sm">
+    <section className="rounded-2xl border border-border bg-surface p-8 shadow-sm">
       <h2 className="mb-2 text-2xl font-bold">Feature-based Clean Architecture</h2>
-      <p className="text-[#6b6461]">
+      <p className="text-muted">
         Kode dipecah per <strong>fitur</strong>, dan setiap fitur memiliki empat lapisan clean
         architecture. Aturan dependensi di dalam fitur:{' '}
         <code>presentation → application → domain</code>. Lapisan <code>infrastructure</code>{' '}
@@ -89,9 +93,9 @@ function ArchitectureStatusPage() {
       <h3 className="mt-6 text-lg font-bold">Lapisan per fitur</h3>
       <ul className="mt-4 grid list-none gap-2 p-0">
         {FEATURE_LAYERS.map((layer) => (
-          <li className="flex flex-wrap items-baseline gap-x-4 gap-y-1 rounded-xl border border-[#e3dedb] bg-[#faf8f7] p-3 text-sm" key={layer.name}>
-            <code className="rounded-lg bg-[#f0ebe9] px-1.5 py-0.5 font-mono text-xs">features/&lt;fitur&gt;/{layer.name}</code>
-            <span className="flex-1 text-[#6b6461]">{layer.desc}</span>
+          <li className="flex flex-wrap items-baseline gap-x-4 gap-y-1 rounded-xl border border-border bg-surface-muted p-3 text-sm" key={layer.name}>
+            <code className="rounded-lg bg-surface-highlight px-1.5 py-0.5 font-mono text-xs">features/&lt;fitur&gt;/{layer.name}</code>
+            <span className="flex-1 text-muted">{layer.desc}</span>
           </li>
         ))}
       </ul>
@@ -99,10 +103,10 @@ function ArchitectureStatusPage() {
       <h3 className="mt-6 text-lg font-bold">Feature slice (sesuai modul PRD)</h3>
       <ul className="mt-4 grid list-none gap-2 p-0">
         {FEATURES.map((feature) => (
-          <li className="flex flex-wrap items-baseline gap-x-4 gap-y-1 rounded-xl border border-[#e3dedb] bg-[#faf8f7] p-3 text-sm" key={feature.name}>
-            <code className="rounded-lg bg-[#f0ebe9] px-1.5 py-0.5 font-mono text-xs">features/{feature.name}</code>
-            <span className="flex-1 text-[#6b6461]">{feature.desc}</span>
-            <span className="rounded-full bg-[#fbe9e7] px-2 py-0.5 text-xs font-bold text-[#8c1d17]">{feature.prd}</span>
+          <li className="flex flex-wrap items-baseline gap-x-4 gap-y-1 rounded-xl border border-border bg-surface-muted p-3 text-sm" key={feature.name}>
+            <code className="rounded-lg bg-surface-highlight px-1.5 py-0.5 font-mono text-xs">features/{feature.name}</code>
+            <span className="flex-1 text-muted">{feature.desc}</span>
+            <span className="rounded-full bg-primary-soft px-2 py-0.5 text-xs font-bold text-primary-hover">{feature.prd}</span>
           </li>
         ))}
       </ul>
@@ -110,9 +114,9 @@ function ArchitectureStatusPage() {
       <h3 className="mt-6 text-lg font-bold">Shared kernel</h3>
       <ul className="mt-4 grid list-none gap-2 p-0">
         {SHARED.map((item) => (
-          <li className="flex flex-wrap items-baseline gap-x-4 gap-y-1 rounded-xl border border-[#e3dedb] bg-[#faf8f7] p-3 text-sm" key={item.name}>
-            <code className="rounded-lg bg-[#f0ebe9] px-1.5 py-0.5 font-mono text-xs">shared/{item.name}</code>
-            <span className="flex-1 text-[#6b6461]">{item.desc}</span>
+          <li className="flex flex-wrap items-baseline gap-x-4 gap-y-1 rounded-xl border border-border bg-surface-muted p-3 text-sm" key={item.name}>
+            <code className="rounded-lg bg-surface-highlight px-1.5 py-0.5 font-mono text-xs">shared/{item.name}</code>
+            <span className="flex-1 text-muted">{item.desc}</span>
           </li>
         ))}
       </ul>
@@ -122,10 +126,10 @@ function ArchitectureStatusPage() {
 
 function NotFoundPage() {
   return (
-    <section className="rounded-2xl border border-[#e3dedb] bg-white p-8 shadow-sm">
+    <section className="rounded-2xl border border-border bg-surface p-8 shadow-sm">
       <h2 className="mb-2 text-2xl font-bold">404 — Halaman tidak ditemukan</h2>
-      <p className="text-[#6b6461]">Rute yang Anda tuju belum tersedia.</p>
-      <Link className="mt-2 inline-flex items-center justify-center rounded-lg bg-[#b3261e] px-5 py-2.5 font-semibold text-white no-underline hover:bg-[#8c1d17]" to="/">
+      <p className="text-muted">Rute yang Anda tuju belum tersedia.</p>
+      <Link className="mt-2 inline-flex items-center justify-center rounded-lg bg-primary px-5 py-2.5 font-semibold text-on-primary no-underline hover:bg-primary-hover" to="/">
         Kembali ke beranda
       </Link>
     </section>
@@ -134,7 +138,18 @@ function NotFoundPage() {
 
 function AppShell() {
   return (
-    <div className="flex min-h-screen flex-col bg-[#f7f5f4]">
+    <Routes>
+      {/* Halaman autentikasi memakai layar penuh, tanpa footer publik. */}
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
+      <Route path="*" element={<PublicShell />} />
+    </Routes>
+  )
+}
+
+function PublicShell() {
+  return (
+    <div className="flex min-h-screen flex-col bg-surface-sunken">
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route
@@ -154,9 +169,9 @@ function AppShell() {
           }
         />
       </Routes>
-      <footer className="flex flex-wrap justify-between gap-2 border-t border-[#e3dedb] bg-white px-4 py-4 text-sm sm:px-8">
+      <footer className="flex flex-wrap justify-between gap-2 border-t border-border bg-surface px-4 py-4 text-sm sm:px-8">
         <span>DarahTerpadu &copy; 2026</span>
-        <span className="text-[#6b6461]">Membangun akses darah yang lebih baik untuk semua.</span>
+        <span className="text-muted">Membangun akses darah yang lebih baik untuk semua.</span>
       </footer>
     </div>
   )

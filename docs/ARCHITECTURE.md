@@ -88,7 +88,7 @@ src/
    ├─ constants/               # konstanta aplikasi, daftar rute, label
    ├─ utils/                   # util murni (format tanggal, dsb.)
    ├─ ui/                      # design system: Button, TextField, Select, Badge
-   └─ styles/global.css        # design token + kelas utilitas
+   └─ styles/global.css        # @config + base layer + utilitas dekoratif
 ```
 
 > Subfolder di dalam sebuah lapisan dibuat **saat berkas pertama ditambahkan** (agar repositori
@@ -302,9 +302,42 @@ features/<fitur>/presentation/pages/*          # render UI
 5. **Waktu** diambil dari port `Clock`, bukan `new Date()` di komponen (agar bisa diuji & stabil).
 6. **Data sensitif** (NIK, hasil screening) hanya lewat `CryptoPort`, tidak pernah di `localStorage`
    atau URL.
-7. **Styling**: satu berkas `shared/styles/global.css`, kelas BEM-ish, tanpa CSS module/framework.
+7. **Styling**: Tailwind CSS v4 + `tailwind.config.js` di root. Semua token (warna, font,
+   bayangan) didefinisikan di config tersebut dan dimuat lewat `@config` di
+   `shared/styles/global.css`; komponen **wajib** memakai kelas token, bukan nilai warna mentah
+   (`#hex`, `rgb()`, `hsl()`).
 8. **Bahasa UI** Indonesia; format tanggal lewat `shared/utils/format-date.ts`.
 9. **Aturan bisnis** ditulis sebagai fungsi murni di `domain/rules/` agar bisa diuji tanpa React.
+
+### 7.1 Token warna (`theme.extend.colors` di `tailwind.config.js`)
+
+| Kelompok       | Token                                                              | Kegunaan                            |
+| -------------- | ------------------------------------------------------------------ | ----------------------------------- |
+| Brand          | `primary-50` … `primary-900`, `primary`, `primary-hover`, `primary-active`, `primary-soft`, `on-primary` | aksi utama, tautan, panel autentikasi |
+| Teks           | `heading`, `foreground`, `label`, `muted`, `placeholder`           | hierarki tipografi                  |
+| Latar          | `background`, `surface`, `surface-muted`, `surface-sunken`, `surface-highlight` | halaman, kartu, area tertekan       |
+| Garis          | `border`, `border-strong`                                          | pembatas, outline kontrol           |
+| Status         | `success`, `warning`, `danger`                                     | umpan balik & validasi              |
+| Bayangan       | `shadow-panel`, `shadow-field`, `shadow-hero`, `shadow-heart`      | elevasi permukaan & dekorasi hero   |
+
+Kelas jadi: `bg-surface`, `text-muted`, `border-border`, `text-on-primary`, dst.
+Untuk gradien dekoratif gunakan utilitas `@utility` di `global.css` (`panel-glow`, `hero-orb`)
+agar tidak ada nilai warna di JSX; nilai token di dalamnya dibaca via fungsi `theme(--color-…)`
+sehingga tetap satu sumber di `tailwind.config.js`.
+
+### 7.2 Token tipografi (`theme.extend.fontFamily`)
+
+| Token          | Kelas          | Font     | Dipakai untuk                                   |
+| -------------- | -------------- | -------- | ----------------------------------------------- |
+| `sans`  | `font-sans`    | Fustat   | teks dasar aplikasi (body, form, paragraf, tombol) |
+| `display` | `font-display` | Fraunces | heading `h1`–`h6`, headline, angka besar       |
+
+Aturan `h1`–`h6 { @apply font-display }` ada di `@layer base`, jadi menulis `<h2>` otomatis
+memakai Fraunces tanpa kelas tambahan. Font dimuat dari Google Fonts lewat `@import` di baris
+pertama `global.css` (dengan `preconnect` di `index.html`).
+
+Karena Fraunces adalah serif, **hindari `tracking-[-0.04em]` atau lebih rapat** pada headline besar
+(spasi antar kata bisa tampak hilang); gunakan rentang `-0.01em` s/d `-0.025em`.
 
 ## 8. Keputusan atas pertanyaan terbuka PRD (§10)
 

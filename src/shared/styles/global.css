@@ -1,1 +1,101 @@
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,800;9..144,900&family=Fustat:wght@200..800&display=swap");
 @import "tailwindcss";
+@config "../../../tailwind.config.js";
+
+/* =============================================================================
+   Design token DarahTerpadu
+   -----------------------------------------------------------------------------
+   Token (warna, font, bayangan) didefinisikan di `tailwind.config.js` pada root
+   proyek dan dimuat lewat directive `@config` di atas.
+
+   Semua komponen WAJIB memakai kelas token — jangan tulis hex/rgb langsung di
+   className. Ubah nilai di tailwind.config.js untuk mengganti tema seluruh
+   aplikasi.
+
+   Tipografi
+   - font-sans         teks dasar aplikasi (Fustat)
+   - font-display      judul, headline, angka besar (Fraunces)
+
+   Konvensi penamaan
+   - primary           warna merek / aksi utama (merah #b3261e)
+   - primary-50..900   skala tint → shade (latar lembut, border, hover, active)
+   - primary-hover     state hover tombol/link primary
+   - primary-active    state tekan tombol primary
+   - primary-soft      latar lembut (badge, banner, chip)
+   - on-primary        teks & ikon di atas permukaan primary
+
+   - heading           judul
+   - foreground        teks utama
+   - label             label form
+   - muted             teks sekunder / keterangan
+   - placeholder       placeholder input
+
+   - background        latar halaman
+   - surface           latar kartu & panel
+   - surface-muted     latar blok sekunder (tab, list)
+   - surface-sunken    latar paling dalam (shell)
+   - surface-highlight latar chip kode / inline code
+
+   - border            garis normal
+   - border-strong     garis lebih tegas
+
+   - success / warning / danger  status sistem
+   ============================================================================= */
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-background font-sans text-foreground antialiased;
+  }
+
+  /* Headline, judul kartu, judul section memakai serif display (Fraunces).
+     Warna tidak di-set di sini agar heading di atas latar primary tetap
+     mewarisi warna dari induknya. */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-display;
+    font-optical-sizing: auto;
+  }
+
+  ::selection {
+    @apply bg-primary-100 text-primary-800;
+  }
+
+  /* Ikon pemilih tanggal ikut warna teks, bukan hitam pekat bawaan browser */
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.5;
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   Utilitas dekoratif berbasis token (tidak ada nilai warna mentah di JSX)
+   Nilai diambil dari theme via fungsi theme(), jadi tetap satu sumber di
+   tailwind.config.js.
+   ----------------------------------------------------------------------------- */
+
+/** Sorotan lembut di panel primary, dipakai layout autentikasi. */
+@utility panel-glow {
+  background-image: radial-gradient(
+    circle at 15% 10%,
+    color-mix(in oklab, theme(--color-on-primary) 18%, transparent),
+    transparent 55%
+  );
+}
+
+/** Orb dekoratif pada hero landing page. */
+@utility hero-orb {
+  background-image: radial-gradient(
+    circle at 35% 30%,
+    theme(--color-surface) 0 5%,
+    theme(--color-primary-200) 45%,
+    theme(--color-primary-300) 100%
+  );
+}
