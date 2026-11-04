@@ -29,13 +29,18 @@ function DropMark() {
 type PublicNavbarProps = {
   /** Menu yang sedang dibuka, ditampilkan dengan warna primary. */
   activeNav?: PublicNavKey
+  /**
+   * Tampilkan tombol Masuk/Daftar. Dimatikan pada halaman yang fokusnya
+   * eksplorasi lokasi, karena ajakan mendaftar sudah ada di dalam halaman.
+   */
+  showAuthActions?: boolean
 }
 
 /**
  * Header publik (landing page, daftar lokasi, detail lokasi).
  * Dipakai lintas fitur sehingga diletakkan di `shared/ui`, bukan di dalam satu fitur.
  */
-export function PublicNavbar({ activeNav }: PublicNavbarProps) {
+export function PublicNavbar({ activeNav, showAuthActions = true }: PublicNavbarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const closeMenu = () => setIsMenuOpen(false)
 
@@ -88,7 +93,11 @@ export function PublicNavbar({ activeNav }: PublicNavbarProps) {
               {link.label}
             </Link>
           ))}
-          <div className="mt-2 flex flex-col gap-2 sm:mt-0 sm:flex-row sm:gap-2">
+          <div
+            className={`mt-2 flex-col gap-2 sm:mt-0 sm:flex-row sm:gap-2 ${
+              showAuthActions ? 'flex' : 'hidden'
+            }`}
+          >
             <Link
               className="inline-flex min-h-9 items-center justify-center whitespace-nowrap rounded-lg border border-primary px-4 py-2 text-sm font-semibold text-primary no-underline transition-colors hover:bg-primary-50 lg:px-5"
               onClick={closeMenu}

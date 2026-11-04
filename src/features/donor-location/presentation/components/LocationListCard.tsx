@@ -7,10 +7,18 @@ type LocationListCardProps = {
   location: LocationSummaryDto
   isSelected: boolean
   onSelect: () => void
+  /** Awalan URL halaman detail, mis. `/lokasi-donor` atau `/jadwal-donor`. */
+  detailBasePath?: string
 }
 
 /** Satu kartu lokasi pada daftar lokasi donor (PDN-02). */
-export function LocationListCard({ index, location, isSelected, onSelect }: LocationListCardProps) {
+export function LocationListCard({
+  index,
+  location,
+  isSelected,
+  onSelect,
+  detailBasePath = '/lokasi-donor',
+}: LocationListCardProps) {
   return (
     <article
       aria-pressed={isSelected}
@@ -56,7 +64,7 @@ export function LocationListCard({ index, location, isSelected, onSelect }: Loca
           <Link
             className="rounded-lg border border-primary px-4 py-1.5 text-xs font-semibold text-primary no-underline transition-colors hover:bg-primary-50"
             onClick={(event) => event.stopPropagation()}
-            to={`/lokasi-donor/${location.id}`}
+            to={`${detailBasePath}/${location.id}`}
           >
             Lihat Detail
           </Link>

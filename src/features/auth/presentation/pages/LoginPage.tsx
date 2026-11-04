@@ -1,11 +1,14 @@
 import type { FormEvent } from 'react'
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom'
 
 import { Button, PasswordField, TextField } from '@/shared/ui'
 
+import { authErrorMessage } from '../../domain/errors/auth-error'
+import { roleHomePath, safeRedirectPath } from '../../domain/rules/role-home'
 import { AuthSplitLayout } from '../components/AuthSplitLayout'
 import { AuthTabs } from '../components/AuthTabs'
+import { useAuth } from '../hooks/use-auth'
 
 type LoginFormValues = {
   email: string
@@ -22,20 +25,45 @@ const INITIAL_VALUES: LoginFormValues = {
 /**
  * Halaman masuk (PDN-04 / UTD-01 / RS-01).
  * Satu pintu untuk pendonor maupun admin UTD/RS — peran diambil dari akun.
- * Integrasi use case `login` belum tersedia, jadi submit baru memvalidasi form.
+ * Setelah berhasil, pengguna dikembalikan ke `?redirect=` (mis. form donor yang
+ * dipilih dari halaman lokasi) atau ke beranda sesuai perannya.
  */
 export function LoginPage() {
+  const { user, isReady, login } = useAuth()
+  const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+
+  const redirectParam = searchParams.get('redirect')
+  const registerHref = redirectParam
+    ? `/register?redirect=${encodeURIComponent(redirectParam)}`
+    : '/register'
+
   const [values, setValues] = useState<LoginFormValues>(INITIAL_VALUES)
-  const [isSubmitted, setIsSubmitted] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   function updateField<K extends keyof LoginFormValues>(field: K, value: LoginFormValues[K]) {
     setValues((previous) => ({ ...previous, [field]: value }))
-    setIsSubmitted(false)
+    setError(null)
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    setIsSubmitted(true)
+    setError(null)
+    setIsSubmitting(true)
+
+    try {
+      const signedIn = await login({ email: values.email, password: values.password })
+      navigate(safeRedirectPath(redirectParam, roleHomePath(signedIn.role)), { replace: true })
+    } catch (caught) {
+      setError(authErrorMessage(caught))
+      setIsSubmitting(false)
+    }
+  }
+
+  // Sudah login (mis. membuka /login dari tautan lama): langsung lanjut.
+  if (isReady && user) {
+    return <Navigate replace to={safeRedirectPath(redirectParam, roleHomePath(user.role))} />
   }
 
   return (
@@ -91,24 +119,29 @@ export function LoginPage() {
           </Link>
         </div>
 
-        <Button className="mt-2" fullWidth type="submit">
-          Masuk
+        <Button className="mt-2" disabled={isSubmitting} fullWidth type="submit">
+          {isSubmitting ? 'Memeriksa akun…' : 'Masuk'}
         </Button>
 
-        {isSubmitted ? (
+        {error ? (
           <p
             aria-live="polite"
-            className="rounded-lg border border-primary-200 bg-primary-50 px-4 py-3 text-xs leading-relaxed text-primary-800"
+            className="rounded-lg border border-danger/30 bg-danger/5 px-4 py-3 text-xs leading-relaxed text-danger"
+            role="alert"
           >
-            Form sudah valid. Integrasi API login (PDN-04, UTD-01, RS-01) belum aktif, jadi sesi
-            belum dibuat.
+            {error}
           </p>
         ) : null}
+
+        <p className="rounded-lg border border-border bg-surface-muted px-4 py-3 text-[11px] leading-relaxed text-muted">
+          Akun demo: <strong className="text-foreground">nabila@donorku.id</strong> dengan password{' '}
+          <strong className="text-foreground">password123</strong>.
+        </p>
       </form>
 
       <p className="mt-6 text-center text-xs text-muted">
         Belum punya akun?{' '}
-        <Link className="font-semibold text-primary hover:underline" to="/register">
+        <Link className="font-semibold text-primary hover:underline" to={registerHref}>
           Daftar sebagai pendonor
         </Link>
         .
