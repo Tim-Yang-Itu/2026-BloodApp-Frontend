@@ -5,10 +5,19 @@ import {
   DonorLocationProvider,
   DonorLocationsPage,
 } from '@/features/donor-location'
-import { LoginPage, RegisterPage } from '@/features/auth'
+import {
+  DonorDashboardPage,
+  DonorFormPage,
+  DonorRegistrationProvider,
+  MyTicketsPage,
+  TicketDetailPage,
+} from '@/features/donor-registration'
+import { AuthProvider, LoginPage, RegisterPage, RequireAuth } from '@/features/auth'
 import { LandingPage } from '@/features/landing-page/presentation/pages/LandingPage'
 
 import { container } from './container'
+import { DonorLayout } from './layouts/DonorLayout'
+import { DonorScheduleDetailRoute } from './pages/donor/DonorScheduleDetailRoute'
 
 /**
  * Composition root UI.
@@ -149,6 +158,44 @@ function AppShell() {
       {/* Halaman autentikasi memakai layar penuh, tanpa footer publik. */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+
+      {/*
+       * PDN-04 → PDN-05 → PDN-06:
+       * area pendonor hanya untuk pengguna yang sudah masuk. Pengguna anonim
+       * dilempar ke login dengan query `redirect` sehingga kembali ke sini.
+       */}
+      <Route
+        element={
+          <RequireAuth>
+            <DonorRegistrationProvider useCases={container.donorRegistration}>
+              <DonorLayout />
+            </DonorRegistrationProvider>
+          </RequireAuth>
+        }
+      >
+        <Route path="/dashboard-pendonor" element={<DonorDashboardPage />} />
+        {/* Pencarian jadwal di dalam area pendonor, tanpa keluar ke halaman publik. */}
+        <Route
+          path="/jadwal-donor"
+          element={
+            <DonorLocationProvider useCases={container.donorLocation}>
+              <DonorLocationsPage embedded />
+            </DonorLocationProvider>
+          }
+        />
+        <Route
+          path="/jadwal-donor/:locationId"
+          element={
+            <DonorLocationProvider useCases={container.donorLocation}>
+              <DonorScheduleDetailRoute />
+            </DonorLocationProvider>
+          }
+        />
+        <Route path="/form-donor" element={<DonorFormPage />} />
+        <Route path="/tiket-saya" element={<MyTicketsPage />} />
+        <Route path="/tiket-saya/:bookingCode" element={<TicketDetailPage />} />
+      </Route>
+
       <Route path="*" element={<PublicShell />} />
     </Routes>
   )
@@ -205,7 +252,9 @@ function PublicShell() {
 export function App() {
   return (
     <BrowserRouter>
-      <AppShell />
+      <AuthProvider useCases={container.auth}>
+        <AppShell />
+      </AuthProvider>
     </BrowserRouter>
   )
 }

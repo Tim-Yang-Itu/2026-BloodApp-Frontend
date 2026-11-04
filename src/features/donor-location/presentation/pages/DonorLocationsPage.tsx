@@ -9,11 +9,19 @@ import { useLocations } from '../hooks/use-locations'
 
 const DEFAULT_CITY = 'Surabaya'
 
+type DonorLocationsPageProps = {
+  /**
+   * Ditampilkan di dalam area pendonor: navbar publik disembunyikan dan
+   * tautan detail menuju rute area pendonor, bukan halaman publik.
+   */
+  embedded?: boolean
+}
+
 /**
  * PDN-02 + EXT-03: halaman daftar lokasi donor.
  * Terbuka tanpa login; pencarian, filter kota, dan peta ilustrasi.
  */
-export function DonorLocationsPage() {
+export function DonorLocationsPage({ embedded = false }: DonorLocationsPageProps) {
   const [query, setQuery] = useState('')
   const [city, setCity] = useState(DEFAULT_CITY)
   const [selectedId, setSelectedId] = useState<string | null>(null)
@@ -32,21 +40,42 @@ export function DonorLocationsPage() {
     setSelectedId(null)
   }
 
-  return (
-    <div className="min-h-screen bg-background">
-      <PublicNavbar activeNav="lokasi" />
+  const detailBasePath = embedded ? '/jadwal-donor' : '/lokasi-donor'
 
-      <main className="mx-auto w-[calc(100%-3rem)] max-w-[1180px] py-10 pb-20">
+  // Di dalam area pendonor, ukuran & padding mengikuti halaman fitur lain
+  // (dashboard, tiket, form donor) agar tampilan konsisten.
+  const containerClass = embedded
+    ? 'w-full px-6 py-10 pb-20'
+    : 'mx-auto w-[calc(100%-3rem)] max-w-[1180px] py-10 pb-20'
+
+  return (
+    <div className={embedded ? 'w-full' : 'min-h-screen bg-background'}>
+      {embedded ? null : <PublicNavbar activeNav="lokasi" showAuthActions={false} />}
+
+      <main className={containerClass}>
         <header>
-          <h1 className="text-[clamp(2rem,4vw,3rem)] font-bold tracking-[-0.015em] text-heading">
+          {embedded ? (
+            <p className="m-0 text-xs font-bold tracking-[0.12em] text-primary uppercase">
+              Cari jadwal donor
+            </p>
+          ) : null}
+          <h1
+            className={
+              embedded
+                ? 'mt-1.5 mb-0 text-3xl font-bold tracking-[-0.02em] text-heading'
+                : 'text-[clamp(2rem,4vw,3rem)] font-bold tracking-[-0.015em] text-heading'
+            }
+          >
             Lokasi Donor Darah
           </h1>
-          <p className="mt-2 text-muted">
-            Temukan tempat donor terdekat. Tidak perlu login untuk melihat lokasi.
+          <p className={embedded ? 'mt-2 mb-0 text-sm text-muted' : 'mt-2 text-muted'}>
+            {embedded
+              ? 'Temukan tempat donor terdekat, lalu pilih jadwal dan isi form donor.'
+              : 'Temukan tempat donor terdekat. Tidak perlu login untuk melihat lokasi.'}
           </p>
         </header>
 
-        <div className="mt-7">
+        <div className={embedded ? 'mt-6' : 'mt-7'}>
           <LocationSearchBar
             cities={cities}
             city={city}
@@ -90,6 +119,7 @@ export function DonorLocationsPage() {
 
             {locations.map((location, index) => (
               <LocationListCard
+                detailBasePath={detailBasePath}
                 index={index}
                 isSelected={location.id === selected?.id}
                 key={location.id}
