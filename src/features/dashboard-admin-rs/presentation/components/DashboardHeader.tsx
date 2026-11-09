@@ -1,4 +1,4 @@
-import { Bell, ChevronRight, Menu, Search, UserRound } from "lucide-react";
+import { Bell, Menu, Search, UserRound } from "lucide-react";
 
 export function DashboardHeader({ onOpenMenu }: { onOpenMenu: () => void }) {
   return (
