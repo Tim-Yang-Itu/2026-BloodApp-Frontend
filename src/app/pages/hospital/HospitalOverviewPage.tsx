@@ -1,25 +1,25 @@
 import { AlertTriangle, CircleCheck, Clock3, Droplet, PackageX } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 
+import { useAuth } from '@/features/auth'
 import { useBloodRequests } from '@/features/blood-request'
 import { MINIMUM_STOCK_PER_GROUP, useBloodStock } from '@/features/blood-stock'
 import { formatLongDate } from '@/shared/utils/format-date'
 
-import { RecentRequestsCard } from '../components/RecentRequestsCard'
-import { StatCard } from '../components/StatCard'
-import { StockSummaryCard } from '../components/StockSummaryCard'
-import type { HospitalTab } from '../types'
-import { toStockGroups } from '../view-model'
-
-type HospitalOverviewSectionProps = {
-  adminName: string
-  onNavigate: (tab: HospitalTab) => void
-}
+import { RecentRequestsCard } from './components/RecentRequestsCard'
+import { StatCard } from './components/StatCard'
+import { StockSummaryCard } from './components/StockSummaryCard'
+import { hospitalPathOf } from './navigation'
+import { toStockGroups } from './view-model'
 
 /** RS-02/RS-04: ringkasan stok darah dan permintaan rumah sakit. */
-export function HospitalOverviewSection({ adminName, onNavigate }: HospitalOverviewSectionProps) {
+export function HospitalOverviewPage() {
+  const { user } = useAuth()
   const { summary, today } = useBloodStock()
   const { requests } = useBloodRequests()
+  const navigate = useNavigate()
 
+  const adminName = user?.profile.fullName ?? 'Admin RS'
   const groups = toStockGroups(summary.groups)
   const pendingRequests = requests.filter((request) => request.status === 'pending')
   const approvedRequests = requests.filter((request) => request.status === 'approved')
@@ -39,7 +39,7 @@ export function HospitalOverviewSection({ adminName, onNavigate }: HospitalOverv
         </div>
         <button
           className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-bold text-on-primary shadow-field hover:bg-primary-hover"
-          onClick={() => onNavigate('requests')}
+          onClick={() => navigate(hospitalPathOf('requests'))}
           type="button"
         >
           <Droplet aria-hidden="true" className="size-4" />
@@ -90,7 +90,7 @@ export function HospitalOverviewSection({ adminName, onNavigate }: HospitalOverv
         </div>
         <button
           className="ml-auto shrink-0 cursor-pointer text-xs font-bold text-primary hover:underline"
-          onClick={() => onNavigate('stock')}
+          onClick={() => navigate(hospitalPathOf('stock'))}
           type="button"
         >
           Cek stok
@@ -98,9 +98,12 @@ export function HospitalOverviewSection({ adminName, onNavigate }: HospitalOverv
       </section>
 
       <div className="mt-6 grid gap-6 xl:grid-cols-2">
-        <StockSummaryCard groups={groups} onViewAll={() => onNavigate('stock')} />
+        <StockSummaryCard
+          groups={groups}
+          onViewAll={() => navigate(hospitalPathOf('stock'))}
+        />
         <RecentRequestsCard
-          onViewAll={() => onNavigate('requests')}
+          onViewAll={() => navigate(hospitalPathOf('requests'))}
           requests={recentRequests}
         />
       </div>

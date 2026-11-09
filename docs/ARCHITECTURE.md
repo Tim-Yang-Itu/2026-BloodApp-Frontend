@@ -56,12 +56,13 @@ src/
 ├─ app/                        # composition root — bukan fitur
 │  ├─ App.tsx                  # shell tipis: AppProviders + AppRoutes
 │  ├─ container.ts             # merakit container seluruh fitur
-│  ├─ layouts/                 # kerangka halaman lintas fitur (DonorLayout, UtdLayout)
+│  ├─ layouts/                 # kerangka halaman lintas fitur (DonorLayout, UtdLayout, HospitalLayout)
 │  ├─ pages/                   # halaman gabungan >1 fitur, dikelompokkan per peran
 │  │  ├─ public/               # PublicLayout + halaman 404
 │  │  ├─ donor/                # route penghubung lintas fitur (detail jadwal)
 │  │  ├─ utd/                  # dashboard Admin UTD/PMI
-│  │  └─ hospital/             # dashboard Admin RS (types, navigation, view-model, sections)
+│  │  └─ hospital/             # dashboard Admin RS (types, navigation, view-model, components,
+│  │                           #   HospitalOverviewPage, HospitalStockPage, HospitalRequestsPage)
 │  ├─ providers/               # AppProviders: BrowserRouter + AuthProvider
 │  └─ router/                  # AppRoutes.tsx: peta rute + guard per peran
 │
@@ -195,12 +196,15 @@ tinggal di `src/app/pages/<peran>/` dan hanya memakai API publik `features/<x>/i
 | Halaman | Modul PRD | Fitur yang dipakai | Rute |
 | --- | --- | --- | --- |
 | `app/pages/utd` | UTD-04, UTD-06 | `blood-stock`, `blood-request` | `/utd`, `/utd/permintaan` |
-| `app/pages/hospital` | RS-02, RS-04, RS-06 | `blood-stock`, `blood-request` | `/dashboard-rs` |
+| `app/pages/hospital` | RS-02, RS-04, RS-06 | `blood-stock`, `blood-request` | `/dashboard-rs`, `/dashboard-rs/stok`, `/dashboard-rs/permintaan` |
 | `app/pages/donor` | PDN-03 | `donor-location` + `donor-registration` | `/jadwal-donor/:locationId` |
 | `app/pages/public` | – | shell publik + halaman 404 | `*` |
 
-Pemetaan tab pada halaman gabungan RS (`HospitalTab` di `app/pages/hospital/types.ts`):
-`overview` = RS-02 ringkasan, `stock` = RS-02 detail ketersediaan, `requests` = RS-04/RS-06.
+Setiap tab pada dashboard RS adalah rute nyata (`HospitalLayout` di `src/app/layouts/` sebagai
+layout route): `overview` = RS-02 ringkasan (`/dashboard-rs`, index), `stock` = RS-02 detail
+ketersediaan (`/dashboard-rs/stok`), `requests` = RS-04/RS-06 (`/dashboard-rs/permintaan`).
+Daftar menu beserta ikonnya ada di `app/pages/hospital/navigation.ts` (`HOSPITAL_NAV_ITEMS`),
+sehingga sidebar memakai `NavLink` dan posisi halaman bertahan setelah refresh.
 
 ### 5.2 Detail per modul
 
@@ -222,11 +226,11 @@ Pemetaan tab pada halaman gabungan RS (`HospitalTab` di `app/pages/hospital/type
 | PDN-05 | Form donor & screening | `donor-registration` | `submit-screening.use-case` | `/donor/daftar` |
 | PDN-06 | Tiket digital QR Code | `donor-registration` | `issue-ticket.use-case`, `scan-ticket.use-case` | `/donor/tiket`, `/utd/scan` |
 | RS-01 | Login dashboard RS | `auth` | `login.use-case` | `/login` |
-| RS-02 | Cek ketersediaan real time | `blood-stock` | `get-availability.use-case` | `/dashboard-rs` (tab *Stok Darah*) |
+| RS-02 | Cek ketersediaan real time | `blood-stock` | `get-availability.use-case` | `/dashboard-rs`, `/dashboard-rs/stok` |
 | RS-03 | Form request darah | `blood-request` | `create-request.use-case` | `/rs/permintaan/baru` |
-| RS-04 | Pelacakan status | `blood-request` | `list-requests.use-case`, `get-request.use-case` | `/dashboard-rs` (tab *Permintaan Darah*) |
+| RS-04 | Pelacakan status | `blood-request` | `list-requests.use-case`, `get-request.use-case` | `/dashboard-rs/permintaan` |
 | RS-05 | Push notifikasi gagal | `notification` | `notify-request-rejected.use-case` | `NotificationBell` |
-| RS-06 | Konfirmasi penerimaan | `blood-request` | `confirm-receipt.use-case` | `/dashboard-rs` (tab *Permintaan Darah*) |
+| RS-06 | Konfirmasi penerimaan | `blood-request` | `confirm-receipt.use-case` | `/dashboard-rs/permintaan` |
 | EXT-01 | Notif ke RS saat disetujui | `notification` | `notify-request-approved.use-case` | `NotificationBell` |
 | EXT-02 | Riwayat donor | `donor-history` | `get-donation-history.use-case` | `/donor/riwayat` |
 | EXT-03 | Filter lokasi (jarak/tanggal) | `donor-location` | `list-locations.use-case` (filter param) | `/lokasi?jarak=&tanggal=` |
@@ -303,7 +307,10 @@ features/<fitur>/presentation/pages/*          # render UI
   (`RequireAuth` / `RequireRole`).
 - `src/app/providers/AppProviders.tsx` merangkai `BrowserRouter` + `AuthProvider`; provider fitur
   lain dipasang pada grup rute yang membutuhkannya di `AppRoutes.tsx` (mis. `blood-stock` dan
-  `blood-request` dipasang untuk grup UTD **dan** rute `/dashboard-rs`).
+  `blood-request` dipasang untuk grup UTD **dan** grup `/dashboard-rs`).
+- Ketiga area peran memakai **layout route** (`src/app/layouts/UtdLayout.tsx`, `DonorLayout.tsx`,
+  `HospitalLayout.tsx`): sidebar/header dipasang sekali di layout, isi halaman lewat `<Outlet />`,
+  dan setiap menu adalah rute nyata sehingga posisi bertahan setelah refresh.
 
 ## 7. Konvensi teknis
 

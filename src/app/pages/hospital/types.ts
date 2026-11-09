@@ -6,5 +6,7 @@ export type HospitalTab = 'overview' | 'stock' | 'requests'
 export type HospitalNavItem = {
   id: HospitalTab
   label: string
+  /** Rute tujuan; sidebar memakai `NavLink` sehingga tab bisa di-bookmark. */
+  to: string
   icon: LucideIcon
 }

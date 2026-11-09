@@ -1,16 +1,15 @@
 import { LogOut, UserRound, X } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { Link, NavLink } from 'react-router-dom'
+
+import { ROUTES } from '@/shared/constants/routes'
 
 import { HOSPITAL_NAV_ITEMS } from '../navigation'
-import type { HospitalTab } from '../types'
 
 type HospitalSidebarProps = {
-  activeTab: HospitalTab
   isOpen: boolean
   /** Jumlah permintaan yang masih menunggu verifikasi UTD. */
   pendingCount: number
   adminName: string
-  onNavigate: (tab: HospitalTab) => void
   onClose: () => void
   /** Menghapus sesi lalu kembali ke halaman masuk. */
   onLogout: () => void
@@ -26,11 +25,9 @@ function DropMark() {
 
 /** Sidebar area Admin RS (drawer pada layar kecil, menetap pada layar besar). */
 export function HospitalSidebar({
-  activeTab,
   isOpen,
   pendingCount,
   adminName,
-  onNavigate,
   onClose,
   onLogout,
 }: HospitalSidebarProps) {
@@ -76,18 +73,16 @@ export function HospitalSidebar({
               const Icon = item.icon
 
               return (
-                <button
-                  className={`flex w-full cursor-pointer items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-semibold transition-colors ${
-                    item.id === activeTab
-                      ? 'bg-primary-50 text-primary'
-                      : 'text-label hover:bg-surface-muted'
-                  }`}
+                <NavLink
+                  className={({ isActive }) =>
+                    `flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-semibold no-underline transition-colors ${
+                      isActive ? 'bg-primary-50 text-primary' : 'text-label hover:bg-surface-muted'
+                    }`
+                  }
+                  end={item.to === ROUTES.hospitalDashboard}
                   key={item.id}
-                  onClick={() => {
-                    onNavigate(item.id)
-                    onClose()
-                  }}
-                  type="button"
+                  onClick={onClose}
+                  to={item.to}
                 >
                   <Icon aria-hidden="true" className="size-[18px]" />
                   {item.label}
@@ -96,7 +91,7 @@ export function HospitalSidebar({
                       {pendingCount}
                     </span>
                   ) : null}
-                </button>
+                </NavLink>
               )
             })}
           </nav>

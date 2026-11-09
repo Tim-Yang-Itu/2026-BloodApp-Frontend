@@ -1,12 +1,12 @@
-import { CircleSlash, CircleCheck, Clock3, Inbox, RefreshCw } from 'lucide-react'
+import { CircleCheck, CircleSlash, Clock3, Inbox, RefreshCw } from 'lucide-react'
 
 import { useBloodRequests } from '@/features/blood-request'
 import { StatusBadge } from '@/shared/ui'
 
-import { StatCard } from '../components/StatCard'
+import { StatCard } from './components/StatCard'
 
 /** RS-04/RS-06: pelacakan status permintaan darah rumah sakit. */
-export function HospitalRequestsSection() {
+export function HospitalRequestsPage() {
   const { requests, isLoading, error, reload } = useBloodRequests()
 
   const pendingCount = requests.filter((request) => request.status === 'pending').length

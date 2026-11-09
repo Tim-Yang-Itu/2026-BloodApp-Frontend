@@ -20,9 +20,12 @@ import { ROUTES } from '@/shared/constants/routes'
 
 import { container } from '../container'
 import { DonorLayout } from '../layouts/DonorLayout'
+import { HospitalLayout } from '../layouts/HospitalLayout'
 import { UtdLayout } from '../layouts/UtdLayout'
 import { DonorScheduleDetailRoute } from '../pages/donor/DonorScheduleDetailRoute'
-import { HospitalDashboardRoute } from '../pages/hospital/HospitalDashboardRoute'
+import { HospitalOverviewPage } from '../pages/hospital/HospitalOverviewPage'
+import { HospitalRequestsPage } from '../pages/hospital/HospitalRequestsPage'
+import { HospitalStockPage } from '../pages/hospital/HospitalStockPage'
 import { NotFoundPage } from '../pages/public/NotFoundPage'
 import { PublicLayout } from '../pages/public/PublicLayout'
 import { UtdDashboardPage } from '../pages/utd/UtdDashboardPage'
@@ -43,7 +46,7 @@ export function AppRoutes() {
       <Route element={<RegisterPage />} path={ROUTES.register} />
 
       {/*
-       * RS-01: dashboard Admin RS hanya untuk peran `hospital`.
+       * RS-01: area Admin RS hanya untuk peran `hospital`.
        * Tanpa guard, pengguna anonim bisa membuka halaman ini dan sesi yang
        * tertinggal membuat /login melempar balik ke sini (tampak seperti
        * "logout gagal").
@@ -53,13 +56,17 @@ export function AppRoutes() {
           <RequireRole role="hospital">
             <BloodStockProvider useCases={container.bloodStock}>
               <BloodRequestProvider useCases={container.bloodRequest}>
-                <HospitalDashboardRoute />
+                <HospitalLayout />
               </BloodRequestProvider>
             </BloodStockProvider>
           </RequireRole>
         }
         path={ROUTES.hospitalDashboard}
-      />
+      >
+        <Route element={<HospitalOverviewPage />} index />
+        <Route element={<HospitalStockPage />} path={ROUTES.hospitalStock} />
+        <Route element={<HospitalRequestsPage />} path={ROUTES.hospitalRequests} />
+      </Route>
 
       {/*
        * PDN-04 → PDN-05 → PDN-06:

@@ -1,8 +1,8 @@
 import { MINIMUM_STOCK_PER_GROUP, useBloodStock } from '@/features/blood-stock'
-import { StatusBadge } from '@/shared/ui'
 import type { StatusTone } from '@/shared/types/status-tone'
+import { StatusBadge } from '@/shared/ui'
 
-import { toStockGroups } from '../view-model'
+import { toStockGroups } from './view-model'
 
 const TONE_BORDER: Record<StatusTone, string> = {
   success: 'border-border',
@@ -13,7 +13,7 @@ const TONE_BORDER: Record<StatusTone, string> = {
 }
 
 /** RS-02: ketersediaan darah real time per golongan darah. */
-export function HospitalStockSection() {
+export function HospitalStockPage() {
   const { summary } = useBloodStock()
   const groups = toStockGroups(summary.groups)
 
@@ -43,8 +43,8 @@ export function HospitalStockSection() {
             <p className="text-xs text-muted">kantong tersedia</p>
             <p className="mt-3 text-[11px] font-semibold text-muted">
               Rh+{' '}
-              <span className={group.positiveLow ? 'text-danger' : undefined}>{group.positive}</span> ·
-              Rh−{' '}
+              <span className={group.positiveLow ? 'text-danger' : undefined}>{group.positive}</span>
+              {' · '}Rh−{' '}
               <span className={group.negativeLow ? 'text-danger' : undefined}>{group.negative}</span>
             </p>
           </article>

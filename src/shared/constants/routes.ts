@@ -9,6 +9,8 @@ export const ROUTES = {
   login: '/login',
   register: '/register',
   hospitalDashboard: '/dashboard-rs',
+  hospitalStock: '/dashboard-rs/stok',
+  hospitalRequests: '/dashboard-rs/permintaan',
   utdDashboard: '/utd',
   utdStock: '/utd/stok',
   utdRequests: '/utd/permintaan',
