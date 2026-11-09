@@ -58,7 +58,7 @@ const RHESUS_OPTIONS = [
  * login dua kali setelah mendaftar.
  */
 export function RegisterPage() {
-  const { user, isReady, registerDonor } = useAuth()
+  const { user, isReady, registerDonor, today } = useAuth()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
 
@@ -165,7 +165,7 @@ export function RegisterPage() {
           <TextField
             id="birthDate"
             label="Tanggal lahir"
-            max={new Date().toISOString().slice(0, 10)}
+            max={today}
             onChange={(event) => updateField('birthDate', event.target.value)}
             required
             type="date"

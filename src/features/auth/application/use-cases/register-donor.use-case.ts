@@ -2,6 +2,7 @@ import { AuthError } from '../../domain/errors/auth-error'
 import type { AuthUser } from '../../domain/entities/user'
 import type { AuthRepository } from '../../domain/repositories/auth-repository'
 import type { RegisterDonorInput } from '../dto/auth.dto'
+import type { ClockPort } from '../ports/clock-port'
 
 export type RegisterDonor = (input: RegisterDonorInput) => Promise<AuthUser>
 
@@ -16,7 +17,10 @@ function createUserId(): string {
  * PDN-04: membuat akun pendonor.
  * Akun langsung dipakai untuk sesi berjalan agar pengguna tidak perlu login dua kali.
  */
-export function createRegisterDonorUseCase(repository: AuthRepository): RegisterDonor {
+export function createRegisterDonorUseCase(
+  repository: AuthRepository,
+  clock: ClockPort,
+): RegisterDonor {
   return async (input) => {
     const fullName = input.fullName.trim()
     const email = input.email.trim().toLowerCase()
@@ -55,7 +59,7 @@ export function createRegisterDonorUseCase(repository: AuthRepository): Register
         bloodType: input.bloodType,
         rhesus: input.rhesus,
       },
-      createdAt: new Date().toISOString(),
+      createdAt: clock.nowIso(),
     }
 
     await repository.create(user, input.password)

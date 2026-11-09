@@ -140,8 +140,11 @@ export function LoginPage() {
           <p className="m-0">
             Akun demo UTD: <strong className="text-foreground">admin@utd.donorku.id</strong>
           </p>
+          <p className="m-0">
+            Akun demo Admin RS: <strong className="text-foreground">admin@rs.donorku.id</strong>
+          </p>
           <p className="mt-1 mb-0">
-            Password keduanya: <strong className="text-foreground">password123</strong>.
+            Password semuanya: <strong className="text-foreground">password123</strong>.
           </p>
         </div>
       </form>

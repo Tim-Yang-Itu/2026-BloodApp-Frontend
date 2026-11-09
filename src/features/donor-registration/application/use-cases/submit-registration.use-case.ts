@@ -5,6 +5,7 @@ import type { DonorRegistrationRepository } from '../../domain/repositories/dono
 import { createBookingCode } from '../../domain/rules/booking-code'
 import { isScreeningComplete, passedScreening } from '../../domain/rules/screening'
 import { toRegistrationDto } from '../mappers/registration-mapper'
+import type { ClockPort } from '../ports/clock-port'
 
 export type SubmitRegistration = (input: SubmitRegistrationInput) => Promise<RegistrationDto>
 
@@ -24,6 +25,7 @@ function randomSequence(): number {
  */
 export function createSubmitRegistrationUseCase(
   repository: DonorRegistrationRepository,
+  clock: ClockPort,
 ): SubmitRegistration {
   return async (input) => {
     const { identity } = input
@@ -80,7 +82,7 @@ export function createSubmitRegistrationUseCase(
         emergencyContactName: identity.emergencyContactName.trim(),
         emergencyContactPhone: identity.emergencyContactPhone.trim(),
       },
-      createdAt: new Date().toISOString(),
+      createdAt: clock.nowIso(),
     }
 
     await repository.create(registration)

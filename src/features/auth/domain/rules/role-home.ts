@@ -10,8 +10,7 @@ export function roleHomePath(role: UserRole): string {
     return '/utd'
   }
 
-  // Dashboard Admin RS belum dibangun.
-  return '/status'
+  return '/dashboard-rs'
 }
 
 /**

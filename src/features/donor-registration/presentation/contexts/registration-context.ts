@@ -9,6 +9,8 @@ export type DonorRegistrationUseCases = {
   submitRegistration: SubmitRegistration
   listRegistrations: ListRegistrations
   getRegistration: GetRegistration
+  /** Tanggal kalender hari ini dari port `Clock` fitur `donor-registration`. */
+  today: string
 }
 
 export const RegistrationContext = createContext<DonorRegistrationUseCases | null>(null)
