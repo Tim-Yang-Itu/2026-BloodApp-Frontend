@@ -5,7 +5,7 @@ import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom'
 import { Button, SelectField, TextField } from '@/shared/ui'
 
 import { authErrorMessage } from '../../domain/errors/auth-error'
-import { roleHomePath, safeRedirectPath } from '../../domain/rules/role-home'
+import { safeLandingPath } from '../../domain/rules/role-home'
 import { AuthSplitLayout } from '../components/AuthSplitLayout'
 import { AuthTabs } from '../components/AuthTabs'
 import { useAuth } from '../hooks/use-auth'
@@ -93,7 +93,7 @@ export function RegisterPage() {
         password: values.password,
       })
 
-      navigate(safeRedirectPath(redirectParam, roleHomePath(created.role)), { replace: true })
+      navigate(safeLandingPath(redirectParam, created.role), { replace: true })
     } catch (caught) {
       setError(authErrorMessage(caught))
       setIsSubmitting(false)
@@ -102,7 +102,7 @@ export function RegisterPage() {
 
   // Sudah login: jangan tampilkan form pendaftaran lagi.
   if (isReady && user) {
-    return <Navigate replace to={safeRedirectPath(redirectParam, roleHomePath(user.role))} />
+    return <Navigate replace to={safeLandingPath(redirectParam, user.role)} />
   }
 
   return (

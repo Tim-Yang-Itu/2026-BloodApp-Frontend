@@ -5,7 +5,7 @@ import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom'
 import { Button, PasswordField, TextField } from '@/shared/ui'
 
 import { authErrorMessage } from '../../domain/errors/auth-error'
-import { roleHomePath, safeRedirectPath } from '../../domain/rules/role-home'
+import { safeLandingPath } from '../../domain/rules/role-home'
 import { AuthSplitLayout } from '../components/AuthSplitLayout'
 import { AuthTabs } from '../components/AuthTabs'
 import { useAuth } from '../hooks/use-auth'
@@ -54,7 +54,7 @@ export function LoginPage() {
 
     try {
       const signedIn = await login({ email: values.email, password: values.password })
-      navigate(safeRedirectPath(redirectParam, roleHomePath(signedIn.role)), { replace: true })
+      navigate(safeLandingPath(redirectParam, signedIn.role), { replace: true })
     } catch (caught) {
       setError(authErrorMessage(caught))
       setIsSubmitting(false)
@@ -63,7 +63,7 @@ export function LoginPage() {
 
   // Sudah login (mis. membuka /login dari tautan lama): langsung lanjut.
   if (isReady && user) {
-    return <Navigate replace to={safeRedirectPath(redirectParam, roleHomePath(user.role))} />
+    return <Navigate replace to={safeLandingPath(redirectParam, user.role)} />
   }
 
   return (
