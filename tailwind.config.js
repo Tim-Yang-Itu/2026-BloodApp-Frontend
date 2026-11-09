@@ -66,6 +66,7 @@ export default {
         success: '#1f7a4d',
         warning: '#a8620a',
         danger: '#c0281c',
+        info: '#4354c9',
       },
       boxShadow: {
         panel: '0 30px 60px -32px rgb(40 30 27 / 0.35)',

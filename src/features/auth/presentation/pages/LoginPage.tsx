@@ -133,10 +133,17 @@ export function LoginPage() {
           </p>
         ) : null}
 
-        <p className="rounded-lg border border-border bg-surface-muted px-4 py-3 text-[11px] leading-relaxed text-muted">
-          Akun demo: <strong className="text-foreground">nabila@donorku.id</strong> dengan password{' '}
-          <strong className="text-foreground">password123</strong>.
-        </p>
+        <div className="rounded-lg border border-border bg-surface-muted px-4 py-3 text-[11px] leading-relaxed text-muted">
+          <p className="m-0">
+            Akun demo pendonor: <strong className="text-foreground">nabila@donorku.id</strong>
+          </p>
+          <p className="m-0">
+            Akun demo UTD: <strong className="text-foreground">admin@utd.donorku.id</strong>
+          </p>
+          <p className="mt-1 mb-0">
+            Password keduanya: <strong className="text-foreground">password123</strong>.
+          </p>
+        </div>
       </form>
 
       <p className="mt-6 text-center text-xs text-muted">

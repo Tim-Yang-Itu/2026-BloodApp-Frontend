@@ -52,3 +52,15 @@ export function formatLongDate(isoDate: string): string {
 export function formatDistance(distanceKm: number): string {
   return `${distanceKm.toFixed(1).replace('.', ',')} km`
 }
+
+const TIME_FORMATTER = new Intl.DateTimeFormat('id-ID', {
+  hour: '2-digit',
+  minute: '2-digit',
+  hour12: false,
+  timeZone: 'UTC',
+})
+
+/** `2026-11-02T03:40:00.000Z` → `10.40` */
+export function formatTime(isoDateTime: string): string {
+  return TIME_FORMATTER.format(new Date(isoDateTime))
+}

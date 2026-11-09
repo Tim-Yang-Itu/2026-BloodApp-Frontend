@@ -1,5 +1,7 @@
 import { BrowserRouter, Link, Route, Routes } from 'react-router-dom'
 
+import { BloodStockProvider, StockPage } from '@/features/blood-stock'
+import { BloodRequestProvider } from '@/features/blood-request'
 import {
   DonorLocationDetailPage,
   DonorLocationProvider,
@@ -12,12 +14,15 @@ import {
   MyTicketsPage,
   TicketDetailPage,
 } from '@/features/donor-registration'
-import { AuthProvider, LoginPage, RegisterPage, RequireAuth } from '@/features/auth'
+import { AuthProvider, LoginPage, RegisterPage, RequireAuth, RequireRole } from '@/features/auth'
 import { LandingPage } from '@/features/landing-page/presentation/pages/LandingPage'
 
 import { container } from './container'
 import { DonorLayout } from './layouts/DonorLayout'
+import { UtdLayout } from './layouts/UtdLayout'
 import { DonorScheduleDetailRoute } from './pages/donor/DonorScheduleDetailRoute'
+import { UtdDashboardPage } from './pages/utd/UtdDashboardPage'
+import { UtdRequestsRoute } from './pages/utd/UtdRequestsRoute'
 
 /**
  * Composition root UI.
@@ -194,6 +199,27 @@ function AppShell() {
         <Route path="/form-donor" element={<DonorFormPage />} />
         <Route path="/tiket-saya" element={<MyTicketsPage />} />
         <Route path="/tiket-saya/:bookingCode" element={<TicketDetailPage />} />
+      </Route>
+
+      {/*
+       * UTD-01 → UTD-06: area UTD hanya untuk peran `utd`.
+       * Stok & permintaan dibagikan lewat provider agar dashboard bisa
+       * meringkas keduanya dalam satu kali render.
+       */}
+      <Route
+        element={
+          <RequireRole role="utd">
+            <BloodStockProvider useCases={container.bloodStock}>
+              <BloodRequestProvider useCases={container.bloodRequest}>
+                <UtdLayout />
+              </BloodRequestProvider>
+            </BloodStockProvider>
+          </RequireRole>
+        }
+      >
+        <Route path="/utd" element={<UtdDashboardPage />} />
+        <Route path="/utd/stok" element={<StockPage />} />
+        <Route path="/utd/permintaan" element={<UtdRequestsRoute />} />
       </Route>
 
       <Route path="*" element={<PublicShell />} />

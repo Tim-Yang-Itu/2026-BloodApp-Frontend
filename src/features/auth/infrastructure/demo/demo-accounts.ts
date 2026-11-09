@@ -27,4 +27,21 @@ export const DEMO_ACCOUNTS: readonly DemoAccount[] = [
     },
     password: 'password123',
   },
+  {
+    user: {
+      id: 'usr_demo_utd',
+      email: 'admin@utd.donorku.id',
+      role: 'utd',
+      profile: {
+        fullName: 'Admin UTD',
+        phone: '081200000001',
+        birthDate: '1988-02-11',
+        gender: 'male',
+        bloodType: 'O',
+        rhesus: 'positive',
+      },
+      createdAt: '2026-10-01T08:00:00.000Z',
+    },
+    password: 'password123',
+  },
 ]
