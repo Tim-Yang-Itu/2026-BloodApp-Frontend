@@ -18,6 +18,8 @@ export type AuthContextValue = AuthUseCases & {
   user: AuthUser | null
   /** `false` selama sesi tersimpan masih dipulihkan. */
   isReady: boolean
+  /** Tanggal kalender hari ini dari port `Clock` fitur `auth`. */
+  today: string
 }
 
 export const AuthContext = createContext<AuthContextValue | null>(null)

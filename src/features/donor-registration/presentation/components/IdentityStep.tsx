@@ -25,11 +25,13 @@ const RHESUS_OPTIONS: readonly SelectOption[] = [
 
 type IdentityStepProps = {
   values: DonorIdentityInput
+  /** Batas atas tanggal lahir (`yyyy-mm-dd`) dari port `Clock`. */
+  maxBirthDate: string
   onChange: <K extends keyof DonorIdentityInput>(field: K, value: DonorIdentityInput[K]) => void
 }
 
 /** Langkah 2: identitas calon pendonor sesuai kartu identitas. */
-export function IdentityStep({ values, onChange }: IdentityStepProps) {
+export function IdentityStep({ values, maxBirthDate, onChange }: IdentityStepProps) {
   return (
     <div>
       <h2 className="text-lg font-bold text-heading">Data diri</h2>
@@ -66,7 +68,7 @@ export function IdentityStep({ values, onChange }: IdentityStepProps) {
             hint="Usia donor 17 sampai 60 tahun. Usia 17 tahun perlu izin tertulis orang tua atau wali."
             id="birthDate"
             label="Tanggal lahir"
-            max={new Date().toISOString().slice(0, 10)}
+            max={maxBirthDate}
             onChange={(event) => onChange('birthDate', event.target.value)}
             required
             type="date"

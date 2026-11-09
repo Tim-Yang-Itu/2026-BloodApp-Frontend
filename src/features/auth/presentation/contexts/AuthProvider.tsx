@@ -9,6 +9,8 @@ import type { AuthContextValue, AuthUseCases } from './auth-context'
 type AuthProviderProps = {
   /** Hasil `createAuthModule()` dari `src/app/container.ts`. */
   useCases: AuthUseCases
+  /** Tanggal kalender hari ini dari port `Clock`; dipakai batas input tanggal. */
+  today: string
   children: ReactNode
 }
 
@@ -17,7 +19,7 @@ type AuthProviderProps = {
  * Sesi sebenarnya dipulihkan dari repository lewat `restoreSession`,
  * sehingga halaman tidak perlu tahu cara penyimpanannya.
  */
-export function AuthProvider({ useCases, children }: AuthProviderProps) {
+export function AuthProvider({ useCases, today, children }: AuthProviderProps) {
   const { login, registerDonor, logout, restoreSession } = useCases
   const [user, setUser] = useState<AuthUser | null>(null)
   const [isReady, setIsReady] = useState(false)
@@ -75,12 +77,13 @@ export function AuthProvider({ useCases, children }: AuthProviderProps) {
     () => ({
       user,
       isReady,
+      today,
       login: signIn,
       registerDonor: signUp,
       logout: signOut,
       restoreSession,
     }),
-    [user, isReady, signIn, signUp, signOut, restoreSession],
+    [user, isReady, today, signIn, signUp, signOut, restoreSession],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

@@ -125,17 +125,23 @@ export class LocalStorageAuthRepository implements AuthRepository {
     return readJson<StoredAccount[]>(ACCOUNTS_KEY, [])
   }
 
-  /** Mengisi akun contoh hanya bila penyimpanan masih kosong. */
+  /**
+   * Menambahkan akun contoh yang belum ada.
+   * Akun bawaan lama tetap dipertahankan agar sesi yang sudah tersimpan tidak hilang.
+   */
   private seedDemoAccounts(): void {
     const accounts = this.readAccounts()
+    const missing = DEMO_ACCOUNTS.filter(
+      (demo) => !accounts.some((account) => account.user.email === demo.user.email),
+    )
 
-    if (accounts.length > 0) {
+    if (missing.length === 0) {
       return
     }
 
-    writeJson(
-      ACCOUNTS_KEY,
-      DEMO_ACCOUNTS.map((account) => toStoredAccount(account.user, account.password)),
-    )
+    writeJson(ACCOUNTS_KEY, [
+      ...accounts,
+      ...missing.map((account) => toStoredAccount(account.user, account.password)),
+    ])
   }
 }

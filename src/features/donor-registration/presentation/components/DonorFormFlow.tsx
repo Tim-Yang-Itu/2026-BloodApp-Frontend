@@ -80,7 +80,7 @@ export function DonorFormFlow({
 }: DonorFormFlowProps) {
   const { user } = useAuth()
   const navigate = useNavigate()
-  const { submitRegistration } = useRegistrationUseCases()
+  const { submitRegistration, today } = useRegistrationUseCases()
 
   const [step, setStep] = useState(0)
   const [identity, setIdentity] = useState<DonorIdentityInput>(() => initialIdentity(user))
@@ -212,7 +212,9 @@ export function DonorFormFlow({
           />
         ) : null}
 
-        {step === 1 ? <IdentityStep onChange={updateIdentity} values={identity} /> : null}
+        {step === 1 ? (
+          <IdentityStep maxBirthDate={today} onChange={updateIdentity} values={identity} />
+        ) : null}
 
         {step === 2 ? (
           <ScreeningStep answers={screening} gender={identity.gender} onChange={updateAnswer} />

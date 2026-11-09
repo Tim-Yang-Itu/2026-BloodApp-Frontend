@@ -54,17 +54,17 @@ src/
 ├─ main.tsx                    # bootstrap React (StrictMode + createRoot)
 │
 ├─ app/                        # composition root — bukan fitur
-│  ├─ App.tsx                  # shell aplikasi: BrowserRouter + layout + rute
-│  ├─ container.ts             # (rencana) merakit container seluruh fitur
-│  ├─ layouts/                 # kerangka halaman lintas fitur (AuthLayout, DashboardLayout)
+│  ├─ App.tsx                  # shell tipis: AppProviders + AppRoutes
+│  ├─ container.ts             # merakit container seluruh fitur
+│  ├─ layouts/                 # kerangka halaman lintas fitur (DonorLayout, UtdLayout, HospitalLayout)
 │  ├─ pages/                   # halaman gabungan >1 fitur, dikelompokkan per peran
-│  │  ├─ public/               # landing PDN-01 (stok + lokasi)
-│  │  ├─ auth/                 # gerbang login/registrasi
-│  │  ├─ donor/                # dashboard pendonor
+│  │  ├─ public/               # PublicLayout + halaman 404
+│  │  ├─ donor/                # route penghubung lintas fitur (detail jadwal)
 │  │  ├─ utd/                  # dashboard Admin UTD/PMI
-│  │  └─ hospital/             # dashboard Admin RS
-│  ├─ providers/               # komposisi React Context global (Auth, Notifications)
-│  └─ router/                  # peta rute + guard per peran
+│  │  └─ hospital/             # dashboard Admin RS (types, navigation, view-model, components,
+│  │                           #   HospitalOverviewPage, HospitalStockPage, HospitalRequestsPage)
+│  ├─ providers/               # AppProviders: BrowserRouter + AuthProvider
+│  └─ router/                  # AppRoutes.tsx: peta rute + guard per peran
 │
 ├─ features/                   # satu folder = satu fitur bisnis (lihat §5)
 │  ├─ auth/                    # UTD-01, RS-01, PDN-04
@@ -72,6 +72,7 @@ src/
 │  ├─ blood-request/           # UTD-06..UTD-09, RS-03, RS-04, RS-06
 │  ├─ donor-location/          # PDN-02, PDN-03, EXT-03
 │  ├─ donor-registration/      # PDN-05, PDN-06
+│  ├─ landing-page/            # PDN-01
 │  ├─ donor-history/           # EXT-02
 │  ├─ notification/            # UTD-05, RS-05, EXT-01, EXT-04
 │  │
@@ -187,7 +188,23 @@ Kolom *Rute* adalah tempat UI-nya dirender.
 | `donor-registration` | PDN-05, PDN-06 | pendonor, Admin UTD (scan) |
 | `donor-history` | EXT-02 | pendonor |
 | `notification` | UTD-05, RS-05, EXT-01, EXT-04 | semua |
-| `app/pages/public` | PDN-01 | publik (halaman gabungan) |
+| `landing-page` | PDN-01 | publik |
+
+Halaman yang menggabungkan lebih dari satu fitur tidak dibuatkan feature slice baru; ia
+tinggal di `src/app/pages/<peran>/` dan hanya memakai API publik `features/<x>/index.ts`:
+
+| Halaman | Modul PRD | Fitur yang dipakai | Rute |
+| --- | --- | --- | --- |
+| `app/pages/utd` | UTD-04, UTD-06 | `blood-stock`, `blood-request` | `/utd`, `/utd/permintaan` |
+| `app/pages/hospital` | RS-02, RS-04, RS-06 | `blood-stock`, `blood-request` | `/dashboard-rs`, `/dashboard-rs/stok`, `/dashboard-rs/permintaan` |
+| `app/pages/donor` | PDN-03 | `donor-location` + `donor-registration` | `/jadwal-donor/:locationId` |
+| `app/pages/public` | – | shell publik + halaman 404 | `*` |
+
+Setiap tab pada dashboard RS adalah rute nyata (`HospitalLayout` di `src/app/layouts/` sebagai
+layout route): `overview` = RS-02 ringkasan (`/dashboard-rs`, index), `stock` = RS-02 detail
+ketersediaan (`/dashboard-rs/stok`), `requests` = RS-04/RS-06 (`/dashboard-rs/permintaan`).
+Daftar menu beserta ikonnya ada di `app/pages/hospital/navigation.ts` (`HOSPITAL_NAV_ITEMS`),
+sehingga sidebar memakai `NavLink` dan posisi halaman bertahan setelah refresh.
 
 ### 5.2 Detail per modul
 
@@ -202,18 +219,18 @@ Kolom *Rute* adalah tempat UI-nya dirender.
 | UTD-07 | Verifikasi & cek stok | `blood-request` | `verify-request.use-case` | `/utd/permintaan/:id` |
 | UTD-08 | Setujui / tolak request | `blood-request` | `approve-request.use-case`, `reject-request.use-case` | `/utd/permintaan/:id` |
 | UTD-09 | Update status request | `blood-request` | `update-request-status.use-case` | otomatis setelah UTD-08 |
-| PDN-01 | Landing page tanpa login | `app/pages/public` | komposisi `blood-stock` + `donor-location` | `/` |
+| PDN-01 | Landing page tanpa login | `landing-page` | komposisi `blood-stock` + `donor-location` | `/` |
 | PDN-02 | Eksplorasi lokasi donor | `donor-location` | `list-locations.use-case` | `/lokasi` |
 | PDN-03 | Detail donor darah | `donor-location` | `get-location-detail.use-case` | `/lokasi/:id` |
 | PDN-04 | Registrasi & login pendonor | `auth` | `register-donor.use-case`, `login.use-case` | `/register`, `/login` |
 | PDN-05 | Form donor & screening | `donor-registration` | `submit-screening.use-case` | `/donor/daftar` |
 | PDN-06 | Tiket digital QR Code | `donor-registration` | `issue-ticket.use-case`, `scan-ticket.use-case` | `/donor/tiket`, `/utd/scan` |
 | RS-01 | Login dashboard RS | `auth` | `login.use-case` | `/login` |
-| RS-02 | Cek ketersediaan real time | `blood-stock` | `get-availability.use-case` | `/rs/ketersediaan` |
+| RS-02 | Cek ketersediaan real time | `blood-stock` | `get-availability.use-case` | `/dashboard-rs`, `/dashboard-rs/stok` |
 | RS-03 | Form request darah | `blood-request` | `create-request.use-case` | `/rs/permintaan/baru` |
-| RS-04 | Pelacakan status | `blood-request` | `list-requests.use-case`, `get-request.use-case` | `/rs/permintaan` |
+| RS-04 | Pelacakan status | `blood-request` | `list-requests.use-case`, `get-request.use-case` | `/dashboard-rs/permintaan` |
 | RS-05 | Push notifikasi gagal | `notification` | `notify-request-rejected.use-case` | `NotificationBell` |
-| RS-06 | Konfirmasi penerimaan | `blood-request` | `confirm-receipt.use-case` | `/rs/permintaan/:id` |
+| RS-06 | Konfirmasi penerimaan | `blood-request` | `confirm-receipt.use-case` | `/dashboard-rs/permintaan` |
 | EXT-01 | Notif ke RS saat disetujui | `notification` | `notify-request-approved.use-case` | `NotificationBell` |
 | EXT-02 | Riwayat donor | `donor-history` | `get-donation-history.use-case` | `/donor/riwayat` |
 | EXT-03 | Filter lokasi (jarak/tanggal) | `donor-location` | `list-locations.use-case` (filter param) | `/lokasi?jarak=&tanggal=` |
@@ -284,8 +301,16 @@ features/<fitur>/presentation/pages/*          # render UI
 - `presentation` **tidak pernah** menyusun dependensi sendiri; ia menerima use case dari hook.
 - Saat backend tersedia: tambahkan `infrastructure/repositories/http-*.ts` pada fitur terkait,
   lalu tukar implementasinya di `container.ts` fitur tersebut. Lapisan lain tidak berubah.
-- `src/app/router/AppRouter.tsx` memetakan rute ke halaman yang diekspor `features/<x>/index.ts`;
-  guard per peran ada di `src/app/router/guards.tsx`.
+- `src/app/router/AppRoutes.tsx` memetakan rute ke halaman yang diekspor `features/<x>/index.ts`
+  memakai konstanta `ROUTES` dari `src/shared/constants/routes.ts` (jangan menulis path literal);
+  guard per peran ada di `features/auth/presentation/components/RequireAuth.tsx`
+  (`RequireAuth` / `RequireRole`).
+- `src/app/providers/AppProviders.tsx` merangkai `BrowserRouter` + `AuthProvider`; provider fitur
+  lain dipasang pada grup rute yang membutuhkannya di `AppRoutes.tsx` (mis. `blood-stock` dan
+  `blood-request` dipasang untuk grup UTD **dan** grup `/dashboard-rs`).
+- Ketiga area peran memakai **layout route** (`src/app/layouts/UtdLayout.tsx`, `DonorLayout.tsx`,
+  `HospitalLayout.tsx`): sidebar/header dipasang sekali di layout, isi halaman lewat `<Outlet />`,
+  dan setiap menu adalah rute nyata sehingga posisi bertahan setelah refresh.
 
 ## 7. Konvensi teknis
 
@@ -300,6 +325,9 @@ features/<fitur>/presentation/pages/*          # render UI
 3. **`import type`** untuk semua impor tipe (`verbatimModuleSyntax`).
 4. **Alias impor** `@/*` → `src/*` (dikonfigurasi di `tsconfig.app.json` dan `vite.config.ts`).
 5. **Waktu** diambil dari port `Clock`, bukan `new Date()` di komponen (agar bisa diuji & stabil).
+   Kontrak: `features/<fitur>/application/ports/clock-port.ts` (`nowIso()`, `today()`);
+   implementasi: `features/<fitur>/infrastructure/clock/system-clock.ts`. Nilai `today`
+   dibagikan ke UI lewat container fitur, bukan dihitung saat render (`max` tanggal lahir, dll.).
 6. **Data sensitif** (NIK, hasil screening) hanya lewat `CryptoPort`, tidak pernah di `localStorage`
    atau URL.
 7. **Styling**: Tailwind CSS v4 + `tailwind.config.js` di root. Semua token (warna, font,
@@ -363,24 +391,24 @@ hanya lewat public API".
 Sudah ada:
 
 - `src/main.tsx` — bootstrap React + impor `@/shared/styles/global.css`.
-- `src/app/App.tsx` — shell (header/nav/footer), `BrowserRouter`, rute `/` dan `/status`.
-- `src/shared/styles/global.css` — design token + kelas dasar.
-- `src/features/<fitur>/index.ts` — public API (masih kosong) untuk 7 fitur, masing-masing
-  mencantumkan ID modul PRD yang dicakup.
-- Folder `app/{pages,layouts,providers,router}`, `features/*/{domain,application,infrastructure,presentation}`,
-  `shared/*` dengan `.gitkeep`.
+- `src/app/App.tsx` — hanya `AppProviders` + `AppRoutes` (17 baris).
+- `src/app/providers/AppProviders.tsx` — `BrowserRouter` + `AuthProvider`.
+- `src/app/router/AppRoutes.tsx` — seluruh tabel rute (publik, auth, pendonor, UTD, RS) memakai `ROUTES`.
+- `src/app/container.ts` — container `auth`, `bloodStock`, `bloodRequest`, `donorLocation`, `donorRegistration`.
+- `src/shared/` — `styles/global.css`, `constants/routes.ts`, `domain/blood.ts`, `types/status-tone.ts`,
+  `utils/{date,format-date}.ts`, `ui/*` (Button, TextField, PasswordField, SelectField, StatusBadge, PublicNavbar).
+- Feature slice terimplementasi: `auth`, `landing-page`, `donor-location`, `donor-registration`,
+  `blood-stock`, `blood-request` — masing-masing dengan `index.ts` sebagai satu-satunya pintu masuk.
+- Halaman gabungan: `app/pages/utd` (UTD-04/06), `app/pages/hospital` (RS-02/04/06), `app/pages/donor`, `app/pages/public`.
 
 Langkah berikutnya yang disarankan (mengikuti prioritas **Wajib** PRD):
 
-1. **`shared`** — `domain/blood-type.ts`, `domain/user-role.ts`, `types/common.ts`,
-   `constants/routes.ts`, `utils/format-date.ts`, `ui/*` (Button, TextField, Select, Badge).
-2. **`auth`** — entity `User`, `AuthRepository`, `login`/`logout`/`restore-session`/`register-donor`,
-   `in-memory-auth-repository` + akun demo, `AuthProvider`, `LoginPage` (UTD-01, RS-01, PDN-04).
-3. **`app`** — `container.ts`, `router/AppRouter.tsx`, `router/guards.tsx`, `layouts/*`,
-   serta halaman landing `app/pages/public/LandingPage.tsx` (PDN-01).
-4. **`blood-stock`** — UTD-02, UTD-03, UTD-04, RS-02 (input kantong + monitoring + ketersediaan).
-5. **`blood-request`** — RS-03, RS-04, UTD-06..UTD-09, RS-06 (state machine PRD §6).
-6. **`donor-location`** — PDN-02, PDN-03, EXT-03 + menu kelola lokasi UTD.
-7. **`donor-registration`** — PDN-05, PDN-06 (screening, tiket QR, scan UTD).
-8. **`notification`** — UTD-05, RS-05, EXT-01, EXT-04.
-9. **`donor-history`** — EXT-02 (bonus, dikerjakan terakhir).
+1. **`shared`** — selesai (`domain`, `types`, `constants/routes.ts`, `utils`, `ui`).
+2. **`auth`** — selesai (`LoginPage`, `RegisterPage`, `RequireAuth`/`RequireRole`, sesi `localStorage`).
+3. **`app`** — selesai (`container.ts`, `router/AppRoutes.tsx`, `providers/AppProviders.tsx`, `layouts/*`).
+4. **`blood-stock`** — sebagian: UTD-02/03/04, RS-02 (input kantong + monitoring + ketersediaan).
+5. **`blood-request`** — sebagian: UTD-06/07/08, RS-04/RS-06; RS-03 (form request baru) belum ada.
+6. **`donor-location`** — sebagian: PDN-02, PDN-03 (EXT-03 filter belum lengkap) + menu kelola lokasi UTD.
+7. **`donor-registration`** — sebagian: PDN-05 (form + screening) dan PDN-06 tiket digital; scan tiket di sisi UTD belum.
+8. **`notification`** — belum diimplementasikan (UTD-05, RS-05, EXT-01, EXT-04).
+9. **`donor-history`** — belum diimplementasikan (EXT-02, bonus terakhir).

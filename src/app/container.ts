@@ -1,4 +1,6 @@
 import { createAuthModule } from '@/features/auth'
+import { createBloodRequestModule } from '@/features/blood-request'
+import { createBloodStockModule } from '@/features/blood-stock'
 import { createDonorLocationModule } from '@/features/donor-location'
 import { createDonorRegistrationModule } from '@/features/donor-registration'
 
@@ -13,6 +15,8 @@ import { createDonorRegistrationModule } from '@/features/donor-registration'
  */
 export const container = {
   auth: createAuthModule(),
+  bloodRequest: createBloodRequestModule(),
+  bloodStock: createBloodStockModule(),
   donorLocation: createDonorLocationModule(),
   donorRegistration: createDonorRegistrationModule(),
 }

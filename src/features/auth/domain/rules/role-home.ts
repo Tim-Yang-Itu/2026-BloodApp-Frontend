@@ -1,15 +1,16 @@
 import type { UserRole } from '../entities/user'
 
-/**
- * Halaman tujuan setelah login berhasil.
- * Dashboard UTD/RS belum dibangun, jadi sementara diarahkan ke halaman status.
- */
+/** Halaman tujuan setelah login berhasil. */
 export function roleHomePath(role: UserRole): string {
   if (role === 'donor') {
     return '/dashboard-pendonor'
   }
 
-  return '/status'
+  if (role === 'utd') {
+    return '/utd'
+  }
+
+  return '/dashboard-rs'
 }
 
 /**
