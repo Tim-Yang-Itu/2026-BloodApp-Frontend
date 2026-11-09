@@ -16,6 +16,7 @@ import {
 } from '@/features/donor-registration'
 import { AuthProvider, LoginPage, RegisterPage, RequireAuth, RequireRole } from '@/features/auth'
 import { LandingPage } from '@/features/landing-page/presentation/pages/LandingPage'
+import { DashboardRS } from '@/features/dashboard-admin-rs/presentation/pages/DashboardRS'
 
 import { container } from './container'
 import { DonorLayout } from './layouts/DonorLayout'
@@ -163,6 +164,7 @@ function AppShell() {
       {/* Halaman autentikasi memakai layar penuh, tanpa footer publik. */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+      <Route path="/dashboard-rs" element={<DashboardRS />} />
 
       {/*
        * PDN-04 → PDN-05 → PDN-06:
