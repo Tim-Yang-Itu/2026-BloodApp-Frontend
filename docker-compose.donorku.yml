@@ -1,0 +1,33 @@
+# ============================================================
+# Deploy — pull image dari Docker Hub, tanpa build.
+#
+#   docker compose up -d              # jalankan / update container
+#   docker compose pull               # ambil image terbaru
+#
+# Image di-build & di-push dari lokal: docker buildx bake --push
+# Aplikasi UI-only: tidak ada env API yang perlu diatur.
+# ============================================================
+
+name: donorku-frontend
+
+services:
+    frontend:
+        image: urfixxy/donorku-frontend:${TAG:-latest}
+        container_name: donorku-frontend
+        restart: unless-stopped
+        pull_policy: always
+        ports:
+            - "${APP_PORT:-2000}:80"
+        environment:
+            TZ: ${TZ:-Asia/Jakarta}
+        healthcheck:
+            test: ["CMD-SHELL", "wget -qO- http://127.0.0.1/healthz >/dev/null 2>&1 || exit 1"]
+            interval: 30s
+            timeout: 3s
+            retries: 3
+            start_period: 5s
+        logging:
+            driver: json-file
+            options:
+                max-size: "10m"
+                max-file: "3"
