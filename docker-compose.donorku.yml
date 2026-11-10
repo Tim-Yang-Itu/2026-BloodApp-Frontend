@@ -17,7 +17,7 @@ services:
         restart: unless-stopped
         pull_policy: always
         ports:
-            - "${APP_PORT:-2000}:80"
+            - "127.0.0.1:${APP_PORT:-5555}:80"
         environment:
             TZ: ${TZ:-Asia/Jakarta}
         healthcheck:
