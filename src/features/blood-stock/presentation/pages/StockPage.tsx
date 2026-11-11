@@ -9,7 +9,7 @@ import {
 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
-import { Button, StatusBadge } from '@/shared/ui'
+import { Button, PageHeader, StatusBadge } from '@/shared/ui'
 
 import type { StockGroupDto } from '../../application/dto/blood-stock.dto'
 import type { BloodBagStatus } from '../../domain/entities/blood-bag'
@@ -29,18 +29,18 @@ function StockTypeCard({ group }: { group: StockGroupDto }) {
         <span className="grid size-9 shrink-0 place-items-center rounded-full bg-primary-50 text-xs font-bold text-primary-700">
           {group.bloodType}
         </span>
-        <p className="m-0 font-display text-2xl leading-none font-bold text-heading">{group.total}</p>
+        <p className="m-0 font-display text-2xl leading-none font-bold text-heading font-sans">{group.total}</p>
         <span className="text-xs text-muted">Kantong</span>
       </div>
 
       <div className="mt-4 grid grid-cols-2 gap-2">
         <div className="rounded-lg bg-surface-muted px-3 py-2">
-          <p className="m-0 text-[11px] text-muted">Rhesus +</p>
+          <p className="m-0 text-lg text-muted">Rhesus +</p>
           <p className="m-0 text-sm font-bold text-foreground">{group.positive}</p>
         </div>
         <div className="rounded-lg bg-surface-muted px-3 py-2">
-          <p className="m-0 text-[11px] text-muted">Rhesus −</p>
-          <p className="m-0 text-sm font-bold text-foreground">{group.negative}</p>
+          <p className="m-0 text-lg text-muted">Rhesus −</p>
+          <p className="m-0 text-md font-bold text-foreground">{group.negative}</p>
         </div>
       </div>
     </article>
@@ -85,14 +85,18 @@ export function StockPage() {
   }
 
   return (
-    <div className="w-full px-6 py-8 pb-16 lg:px-8">
-      <header className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="m-0 text-3xl font-bold tracking-[-0.02em] text-heading">Stok Darah</h1>
-        <Button onClick={() => setIsDialogOpen(true)}>
-          <Plus aria-hidden="true" className="size-4" />
-          Tambah Kantong
-        </Button>
-      </header>
+    <div className="w-full">
+      <PageHeader
+        actions={
+          <Button onClick={() => setIsDialogOpen(true)}>
+            <Plus aria-hidden="true" className="size-4" />
+            Tambah Kantong
+          </Button>
+        }
+        description="Catat kantong masuk dan pantau masa simpannya."
+        eyebrow="Manajemen stok"
+        title="Stok Darah"
+      />
 
       <div className="mt-7 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {summary.groups.map((group) => (

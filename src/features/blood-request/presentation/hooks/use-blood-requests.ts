@@ -1,20 +1,30 @@
 import { useCallback, useEffect, useState } from 'react'
 
-import type { BloodRequestDto } from '../../application/dto/blood-request.dto'
+import type {
+  BloodRequestDto,
+  CreateBloodRequestInput,
+} from '../../application/dto/blood-request.dto'
 import { useBloodRequestUseCases } from '../contexts/blood-request-context'
 
 type UseBloodRequestsResult = {
   requests: BloodRequestDto[]
   isLoading: boolean
   error: string | null
+  create: (input: CreateBloodRequestInput) => Promise<BloodRequestDto>
   approve: (requestId: string) => Promise<void>
   reject: (requestId: string, reason: string) => Promise<void>
   reload: () => void
 }
 
-/** Memuat daftar permintaan RS beserta aksi verifikasi. */
+/** Memuat daftar permintaan RS beserta aksi pengajuan dan verifikasi. */
 export function useBloodRequests(): UseBloodRequestsResult {
-  const { listRequests, approveRequest, rejectRequest } = useBloodRequestUseCases()
+  const {
+    listRequests,
+    createRequest,
+    approveRequest,
+    rejectRequest,
+    subscribeToChanges,
+  } = useBloodRequestUseCases()
   const [requests, setRequests] = useState<BloodRequestDto[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -58,6 +68,18 @@ export function useBloodRequests(): UseBloodRequestsResult {
     setVersion((current) => current + 1)
   }, [])
 
+  useEffect(() => subscribeToChanges(reload), [subscribeToChanges, reload])
+
+  const create = useCallback(
+    async (input: CreateBloodRequestInput) => {
+      const created = await createRequest(input)
+      reload()
+
+      return created
+    },
+    [createRequest, reload],
+  )
+
   const approve = useCallback(
     async (requestId: string) => {
       await approveRequest(requestId)
@@ -74,5 +96,5 @@ export function useBloodRequests(): UseBloodRequestsResult {
     [rejectRequest, reload],
   )
 
-  return { requests, isLoading, error, approve, reject, reload }
+  return { requests, isLoading, error, create, approve, reject, reload }
 }

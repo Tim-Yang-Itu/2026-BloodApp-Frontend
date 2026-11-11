@@ -44,12 +44,12 @@ export function LocationListCard({
 
       <div className="flex min-w-0 flex-1 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
-          <h3 className="text-lg leading-snug font-bold text-heading">
+          <h3 className="text-lg leading-snug font-bold font-sans text-heading">
             {location.name}{' '}
-            <span className="text-xs font-bold tracking-[0.04em] text-primary">
+          </h3>
+          <span className="text-xs font-bold tracking-[0.04em] text-primary">
               {location.typeLabel}
             </span>
-          </h3>
           <p className="mt-1 text-sm text-muted">
             {location.address}, {location.city}
           </p>

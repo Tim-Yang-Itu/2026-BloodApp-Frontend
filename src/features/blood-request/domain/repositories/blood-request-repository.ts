@@ -9,5 +9,6 @@ export type BloodRequestStatusUpdate = {
 export type BloodRequestRepository = {
   findAll(): Promise<readonly BloodRequest[]>
   findById(requestId: string): Promise<BloodRequest | null>
+  create(request: BloodRequest): Promise<BloodRequest>
   updateStatus(requestId: string, update: BloodRequestStatusUpdate): Promise<BloodRequest | null>
 }

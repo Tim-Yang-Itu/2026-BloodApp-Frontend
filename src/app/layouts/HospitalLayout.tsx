@@ -1,52 +1,47 @@
-import { useState } from 'react'
-import { Outlet, useLocation } from 'react-router-dom'
+import { useMemo } from 'react'
 
-import { useAuth } from '@/features/auth'
-import { useBloodRequests } from '@/features/blood-request'
+import { initialsOf, useAuth } from '@/features/auth'
+import { DashboardLayout } from '@/shared/ui'
 
-import { HospitalHeader } from '../pages/hospital/components/HospitalHeader'
-import { HospitalSidebar } from '../pages/hospital/components/HospitalSidebar'
-import { hospitalNavItemOf } from '../pages/hospital/navigation'
+import { HOSPITAL_NAV_ITEMS } from '../pages/hospital/navigation'
+import { useHospitalRequests } from '../pages/hospital/use-hospital-requests'
 
 /**
  * Layout area Admin RS.
  *
- * Sejajar dengan `UtdLayout` dan `DonorLayout`: sidebar + bilah atas dipasang
- * sekali, isi halaman datang dari `<Outlet />`. Navigasi memakai rute
- * (`/dashboard-rs`, `/dashboard-rs/stok`, `/dashboard-rs/permintaan`) sehingga
- * tidak ada tab yang hilang saat halaman dimuat ulang.
+ * Kerangka visual (sidebar, drawer layar kecil, footer) berasal dari
+ * `DashboardLayout` sehingga identik dengan area pendonor dan UTD. Yang
+ * tersisa di sini hanya navigasi RS dan lencana jumlah permintaan menunggu.
  */
 export function HospitalLayout() {
   const { user, logout } = useAuth()
-  const { requests } = useBloodRequests()
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
-  const location = useLocation()
+  const { requests, hospitalName } = useHospitalRequests()
 
-  const adminName = user?.profile.fullName ?? 'Admin RS'
   const pendingCount = requests.filter((request) => request.status === 'pending').length
-  const activeItem = hospitalNavItemOf(location.pathname)
+
+  const navItems = useMemo(
+    () =>
+      HOSPITAL_NAV_ITEMS.map((item) => ({
+        to: item.to,
+        label: item.label,
+        icon: item.icon,
+        end: item.to === HOSPITAL_NAV_ITEMS[0].to,
+        badge: item.id === 'requests' ? pendingCount : undefined,
+      })),
+    [pendingCount],
+  )
 
   return (
-    <div className="flex min-h-screen bg-surface-sunken">
-      <HospitalSidebar
-        adminName={adminName}
-        isOpen={isSidebarOpen}
-        onClose={() => setIsSidebarOpen(false)}
-        onLogout={() => void logout()}
-        pendingCount={pendingCount}
-      />
-
-      <div className="flex min-w-0 flex-1 flex-col">
-        <HospitalHeader
-          adminName={adminName}
-          onOpenMenu={() => setIsSidebarOpen(true)}
-          title={activeItem.label}
-        />
-
-        <main className="flex-1 px-5 py-8 sm:px-8 lg:px-10">
-          <Outlet />
-        </main>
-      </div>
-    </div>
+    <DashboardLayout
+      navItems={navItems}
+      navLabel="Navigasi Admin RS"
+      onLogout={() => void logout()}
+      sidebarId="hospital-sidebar"
+      user={{
+        name: user?.profile.fullName ?? 'Admin RS',
+        detail: hospitalName ?? 'Admin Rumah Sakit',
+        initials: user ? initialsOf(user.profile.fullName) : 'RS',
+      }}
+    />
   )
 }

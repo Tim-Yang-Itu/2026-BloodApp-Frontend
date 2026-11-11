@@ -11,6 +11,7 @@ export const ROUTES = {
   hospitalDashboard: '/dashboard-rs',
   hospitalStock: '/dashboard-rs/stok',
   hospitalRequests: '/dashboard-rs/permintaan',
+  hospitalRequestNew: '/dashboard-rs/permintaan/baru',
   utdDashboard: '/utd',
   utdStock: '/utd/stok',
   utdRequests: '/utd/permintaan',

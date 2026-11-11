@@ -1,13 +1,15 @@
-import { CircleCheck, CircleSlash, Clock3, Inbox, RefreshCw } from 'lucide-react'
+import { CircleCheck, CircleSlash, Clock3, Inbox, Plus, RefreshCw } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 
-import { useBloodRequests } from '@/features/blood-request'
-import { StatusBadge } from '@/shared/ui'
+import { ROUTES } from '@/shared/constants/routes'
+import { Button, PageHeader, StatCard, StatusBadge } from '@/shared/ui'
 
-import { StatCard } from './components/StatCard'
+import { useHospitalRequests } from './use-hospital-requests'
 
 /** RS-04/RS-06: pelacakan status permintaan darah rumah sakit. */
 export function HospitalRequestsPage() {
-  const { requests, isLoading, error, reload } = useBloodRequests()
+  const { requests, isLoading, error, reload, hospitalName } = useHospitalRequests()
+  const navigate = useNavigate()
 
   const pendingCount = requests.filter((request) => request.status === 'pending').length
   const approvedCount = requests.filter((request) => request.status === 'approved').length
@@ -15,22 +17,28 @@ export function HospitalRequestsPage() {
 
   return (
     <section>
-      <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="text-sm font-semibold text-primary">Pelacakan pengajuan</p>
-          <h1 className="mt-1 text-3xl font-bold text-heading">Permintaan Darah</h1>
-          <p className="mt-2 text-sm text-muted">
-            Pantau status seluruh permintaan darah yang diajukan.
-          </p>
-        </div>
-        <button
-          className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-border bg-surface px-4 py-3 text-sm font-bold text-foreground hover:bg-surface-muted"
-          onClick={reload}
-          type="button"
-        >
-          <RefreshCw aria-hidden="true" className="size-4" />
-          Muat ulang
-        </button>
+      <div className="mb-8">
+        <PageHeader
+          actions={
+            <>
+              <button
+                className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-border bg-surface px-4 py-3 text-sm font-bold text-foreground hover:bg-surface-muted"
+                onClick={reload}
+                type="button"
+              >
+                <RefreshCw aria-hidden="true" className="size-4" />
+                Muat ulang
+              </button>
+              <Button onClick={() => navigate(ROUTES.hospitalRequestNew)}>
+                <Plus aria-hidden="true" className="size-4" />
+                Ajukan permintaan
+              </Button>
+            </>
+          }
+          description={`Pantau status permintaan darah yang diajukan ${hospitalName ?? 'rumah sakit Anda'}.`}
+          eyebrow="Pelacakan pengajuan"
+          title="Permintaan Darah"
+        />
       </div>
 
       <div className="mb-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -68,11 +76,10 @@ export function HospitalRequestsPage() {
 
       <div className="overflow-hidden rounded-2xl border border-border bg-surface">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[760px] text-left text-sm">
+          <table className="w-full min-w-[680px] text-left text-sm">
             <thead className="bg-surface-muted text-xs text-muted">
               <tr>
                 <th className="px-5 py-4 font-semibold">ID Permintaan</th>
-                <th className="px-5 py-4 font-semibold">Rumah Sakit</th>
                 <th className="px-5 py-4 font-semibold">Golongan</th>
                 <th className="px-5 py-4 font-semibold">Jumlah</th>
                 <th className="px-5 py-4 font-semibold">Urgensi</th>
@@ -83,7 +90,7 @@ export function HospitalRequestsPage() {
             <tbody className="divide-y divide-border">
               {isLoading ? (
                 <tr>
-                  <td className="px-5 py-6 text-muted" colSpan={7}>
+                  <td className="px-5 py-6 text-muted" colSpan={6}>
                     Memuat data permintaan…
                   </td>
                 </tr>
@@ -91,7 +98,7 @@ export function HospitalRequestsPage() {
 
               {!isLoading && requests.length === 0 ? (
                 <tr>
-                  <td className="px-5 py-6 text-muted" colSpan={7}>
+                  <td className="px-5 py-6 text-muted" colSpan={6}>
                     Belum ada permintaan darah.
                   </td>
                 </tr>
@@ -100,7 +107,6 @@ export function HospitalRequestsPage() {
               {requests.map((request) => (
                 <tr className="text-label" key={request.id}>
                   <td className="px-5 py-4 font-bold text-heading">{request.id}</td>
-                  <td className="px-5 py-4">{request.hospitalName}</td>
                   <td className="px-5 py-4 font-bold text-primary">{request.bloodLabel}</td>
                   <td className="px-5 py-4">{request.quantity} kantong</td>
                   <td className="px-5 py-4">{request.urgencyLabel}</td>

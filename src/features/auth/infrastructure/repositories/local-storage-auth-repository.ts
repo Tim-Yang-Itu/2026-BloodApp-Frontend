@@ -126,22 +126,32 @@ export class LocalStorageAuthRepository implements AuthRepository {
   }
 
   /**
-   * Menambahkan akun contoh yang belum ada.
-   * Akun bawaan lama tetap dipertahankan agar sesi yang sudah tersimpan tidak hilang.
+   * Menyelaraskan akun contoh dengan fixture terbaru.
+   *
+   * Data pengguna demo selalu diambil ulang dari `DEMO_ACCOUNTS` agar
+   * perubahan fixture (mis. `hospitalName` pada admin RS) ikut terbawa ke
+   * sesi yang sudah tersimpan, sementara password dan akun pendaftar asli
+   * tidak disentuh.
    */
   private seedDemoAccounts(): void {
     const accounts = this.readAccounts()
-    const missing = DEMO_ACCOUNTS.filter(
-      (demo) => !accounts.some((account) => account.user.email === demo.user.email),
-    )
 
-    if (missing.length === 0) {
+    const next = accounts.map((account) => {
+      const demo = DEMO_ACCOUNTS.find((item) => item.user.email === account.user.email)
+
+      return demo ? { ...account, user: demo.user } : account
+    })
+
+    for (const demo of DEMO_ACCOUNTS) {
+      if (!next.some((account) => account.user.email === demo.user.email)) {
+        next.push(toStoredAccount(demo.user, demo.password))
+      }
+    }
+
+    if (JSON.stringify(next) === JSON.stringify(accounts)) {
       return
     }
 
-    writeJson(ACCOUNTS_KEY, [
-      ...accounts,
-      ...missing.map((account) => toStoredAccount(account.user, account.password)),
-    ])
+    writeJson(ACCOUNTS_KEY, next)
   }
 }
