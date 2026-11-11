@@ -1,10 +1,10 @@
 import { useMemo } from 'react'
 
 import { initialsOf, useAuth } from '@/features/auth'
-import { useBloodRequests } from '@/features/blood-request'
 import { DashboardLayout } from '@/shared/ui'
 
 import { HOSPITAL_NAV_ITEMS } from '../pages/hospital/navigation'
+import { useHospitalRequests } from '../pages/hospital/use-hospital-requests'
 
 /**
  * Layout area Admin RS.
@@ -15,7 +15,7 @@ import { HOSPITAL_NAV_ITEMS } from '../pages/hospital/navigation'
  */
 export function HospitalLayout() {
   const { user, logout } = useAuth()
-  const { requests } = useBloodRequests()
+  const { requests, hospitalName } = useHospitalRequests()
 
   const pendingCount = requests.filter((request) => request.status === 'pending').length
 
@@ -39,7 +39,7 @@ export function HospitalLayout() {
       sidebarId="hospital-sidebar"
       user={{
         name: user?.profile.fullName ?? 'Admin RS',
-        detail: 'Admin Rumah Sakit',
+        detail: hospitalName ?? 'Admin Rumah Sakit',
         initials: user ? initialsOf(user.profile.fullName) : 'RS',
       }}
     />

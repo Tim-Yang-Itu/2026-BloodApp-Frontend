@@ -112,7 +112,7 @@ export function UtdDashboardPage() {
       <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
         <section className="rounded-2xl border border-border bg-surface p-5 shadow-field">
           <div className="flex items-center justify-between gap-3">
-            <h2 className="m-0 text-lg font-bold text-heading">Stok per golongan</h2>
+            <h2 className="m-0 text-lg font-bold text-heading font-sans">Stok per golongan</h2>
             <Link
               className="text-xs font-bold text-primary no-underline hover:text-primary-800"
               to="/utd/stok"
@@ -145,7 +145,7 @@ export function UtdDashboardPage() {
         </section>
 
         <section className="rounded-2xl border border-border bg-surface p-5 shadow-field">
-          <h2 className="m-0 text-lg font-bold text-heading">Stok kritis</h2>
+          <h2 className="m-0 text-lg font-bold text-heading font-sans">Stok kritis</h2>
           <p className="mt-1 mb-0 text-xs text-muted">
             Di bawah batas minimum {MINIMUM_STOCK_PER_GROUP} kantong
           </p>
@@ -173,7 +173,7 @@ export function UtdDashboardPage() {
       <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
         <section className="overflow-hidden rounded-2xl border border-border bg-surface shadow-field">
           <div className="flex items-center justify-between gap-3 p-5 pb-2">
-            <h2 className="m-0 text-lg font-bold text-heading">Permintaan RS terbaru</h2>
+            <h2 className="m-0 text-lg font-bold text-heading font-sans">Permintaan RS terbaru</h2>
             <Link
               className="text-xs font-bold text-primary no-underline hover:text-primary-800"
               to="/utd/permintaan"
@@ -229,7 +229,7 @@ export function UtdDashboardPage() {
         <div className="space-y-5">
           <section className="rounded-2xl border border-border bg-surface p-5 shadow-field">
             <div className="flex items-center justify-between gap-3">
-              <h2 className="m-0 text-lg font-bold text-heading">Segera expired</h2>
+              <h2 className="m-0 text-lg font-bold text-heading font-sans">Segera expired</h2>
               <Link
                 className="text-xs font-bold text-primary no-underline hover:text-primary-800"
                 to="/utd/stok"
@@ -263,7 +263,7 @@ export function UtdDashboardPage() {
           </section>
 
           <section className="rounded-2xl border border-border bg-surface p-5 shadow-field">
-            <h2 className="m-0 text-lg font-bold text-heading">Aktivitas terbaru</h2>
+            <h2 className="m-0 text-lg font-bold text-heading font-sans">Aktivitas terbaru</h2>
 
             <div className="mt-4 space-y-3">
               {activities.length === 0 ? (

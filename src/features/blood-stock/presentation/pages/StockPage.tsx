@@ -29,18 +29,18 @@ function StockTypeCard({ group }: { group: StockGroupDto }) {
         <span className="grid size-9 shrink-0 place-items-center rounded-full bg-primary-50 text-xs font-bold text-primary-700">
           {group.bloodType}
         </span>
-        <p className="m-0 font-display text-2xl leading-none font-bold text-heading">{group.total}</p>
+        <p className="m-0 font-display text-2xl leading-none font-bold text-heading font-sans">{group.total}</p>
         <span className="text-xs text-muted">Kantong</span>
       </div>
 
       <div className="mt-4 grid grid-cols-2 gap-2">
         <div className="rounded-lg bg-surface-muted px-3 py-2">
-          <p className="m-0 text-[11px] text-muted">Rhesus +</p>
+          <p className="m-0 text-lg text-muted">Rhesus +</p>
           <p className="m-0 text-sm font-bold text-foreground">{group.positive}</p>
         </div>
         <div className="rounded-lg bg-surface-muted px-3 py-2">
-          <p className="m-0 text-[11px] text-muted">Rhesus −</p>
-          <p className="m-0 text-sm font-bold text-foreground">{group.negative}</p>
+          <p className="m-0 text-lg text-muted">Rhesus −</p>
+          <p className="m-0 text-md font-bold text-foreground">{group.negative}</p>
         </div>
       </div>
     </article>

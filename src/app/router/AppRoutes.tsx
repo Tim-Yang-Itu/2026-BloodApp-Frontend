@@ -24,6 +24,7 @@ import { HospitalLayout } from '../layouts/HospitalLayout'
 import { UtdLayout } from '../layouts/UtdLayout'
 import { DonorScheduleDetailRoute } from '../pages/donor/DonorScheduleDetailRoute'
 import { HospitalOverviewPage } from '../pages/hospital/HospitalOverviewPage'
+import { HospitalRequestFormPage } from '../pages/hospital/HospitalRequestFormPage'
 import { HospitalRequestsPage } from '../pages/hospital/HospitalRequestsPage'
 import { HospitalStockPage } from '../pages/hospital/HospitalStockPage'
 import { NotFoundPage } from '../pages/public/NotFoundPage'
@@ -66,6 +67,7 @@ export function AppRoutes() {
         <Route element={<HospitalOverviewPage />} index />
         <Route element={<HospitalStockPage />} path={ROUTES.hospitalStock} />
         <Route element={<HospitalRequestsPage />} path={ROUTES.hospitalRequests} />
+        <Route element={<HospitalRequestFormPage />} path={ROUTES.hospitalRequestNew} />
       </Route>
 
       {/*

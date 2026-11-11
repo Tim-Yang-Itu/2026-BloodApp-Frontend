@@ -57,6 +57,7 @@ export const DEMO_ACCOUNTS: readonly DemoAccount[] = [
         bloodType: 'B',
         rhesus: 'positive',
       },
+      hospitalName: 'RS Harapan Sehat',
       createdAt: '2026-10-01T08:00:00.000Z',
     },
     password: 'password123',

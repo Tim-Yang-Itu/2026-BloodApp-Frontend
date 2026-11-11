@@ -2,7 +2,6 @@ import { AlertTriangle, CircleCheck, Clock3, Droplet, PackageX } from 'lucide-re
 import { useNavigate } from 'react-router-dom'
 
 import { useAuth } from '@/features/auth'
-import { useBloodRequests } from '@/features/blood-request'
 import { MINIMUM_STOCK_PER_GROUP, useBloodStock } from '@/features/blood-stock'
 import { PageHeader, StatCard } from '@/shared/ui'
 import { formatLongDate } from '@/shared/utils/format-date'
@@ -10,13 +9,14 @@ import { formatLongDate } from '@/shared/utils/format-date'
 import { RecentRequestsCard } from './components/RecentRequestsCard'
 import { StockSummaryCard } from './components/StockSummaryCard'
 import { hospitalPathOf } from './navigation'
+import { useHospitalRequests } from './use-hospital-requests'
 import { toStockGroups } from './view-model'
 
 /** RS-02/RS-04: ringkasan stok darah dan permintaan rumah sakit. */
 export function HospitalOverviewPage() {
   const { user } = useAuth()
   const { summary, today } = useBloodStock()
-  const { requests } = useBloodRequests()
+  const { requests } = useHospitalRequests()
   const navigate = useNavigate()
 
   const adminName = user?.profile.fullName ?? 'Admin RS'
