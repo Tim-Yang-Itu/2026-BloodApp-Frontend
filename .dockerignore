@@ -1,0 +1,30 @@
+# dependencies & build output (di-generate di dalam image)
+node_modules
+dist
+dist-ssr
+
+# VCS & editor
+.git
+.gitignore
+.github
+.vscode
+.idea
+
+# Docker files sendiri
+Dockerfile
+.dockerignore
+docker-compose*.yml
+docker-compose*.yaml
+docker-bake.hcl
+
+# log & cache lokal
+logs
+*.log
+npm-debug.log*
+.npm
+*.local
+coverage
+
+# dokumen (tidak dibutuhkan untuk build)
+docs
+*.md
