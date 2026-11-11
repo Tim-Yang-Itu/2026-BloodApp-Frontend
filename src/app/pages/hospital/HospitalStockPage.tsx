@@ -1,6 +1,6 @@
 import { MINIMUM_STOCK_PER_GROUP, useBloodStock } from '@/features/blood-stock'
+import { PageHeader, StatusBadge } from '@/shared/ui'
 import type { StatusTone } from '@/shared/types/status-tone'
-import { StatusBadge } from '@/shared/ui'
 
 import { toStockGroups } from './view-model'
 
@@ -20,11 +20,11 @@ export function HospitalStockPage() {
   return (
     <section>
       <div className="mb-8">
-        <p className="text-sm font-semibold text-primary">Ketersediaan real time</p>
-        <h1 className="mt-1 text-3xl font-bold text-heading">Stok Darah</h1>
-        <p className="mt-2 text-sm text-muted">
-          Pantau ketersediaan kantong darah terbaru dari UTD.
-        </p>
+        <PageHeader
+          description="Pantau ketersediaan kantong darah terbaru dari UTD."
+          eyebrow="Ketersediaan real time"
+          title="Stok Darah"
+        />
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">

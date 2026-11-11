@@ -61,12 +61,12 @@ export function DonorLocationDetailPage({
 
   const listHref = embedded ? '/jadwal-donor' : '/lokasi-donor'
 
-  // Di dalam area pendonor, ukuran & padding mengikuti halaman fitur lain.
+  // Di dalam area pendonor, padding halaman sudah disediakan layout peran.
   const containerClass = embedded
-    ? 'w-full px-6 py-10 pb-20'
+    ? 'w-full'
     : 'mx-auto w-[calc(100%-3rem)] max-w-[1180px] py-8 pb-20'
   const centeredClass = embedded
-    ? 'w-full px-6 py-20 text-center'
+    ? 'w-full py-20 text-center'
     : 'mx-auto w-[calc(100%-3rem)] max-w-[640px] py-20 text-center'
 
   const [selectedDate, setSelectedDate] = useState<string | null>(null)

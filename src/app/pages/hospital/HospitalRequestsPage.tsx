@@ -1,9 +1,7 @@
 import { CircleCheck, CircleSlash, Clock3, Inbox, RefreshCw } from 'lucide-react'
 
 import { useBloodRequests } from '@/features/blood-request'
-import { StatusBadge } from '@/shared/ui'
-
-import { StatCard } from './components/StatCard'
+import { PageHeader, StatCard, StatusBadge } from '@/shared/ui'
 
 /** RS-04/RS-06: pelacakan status permintaan darah rumah sakit. */
 export function HospitalRequestsPage() {
@@ -15,22 +13,22 @@ export function HospitalRequestsPage() {
 
   return (
     <section>
-      <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="text-sm font-semibold text-primary">Pelacakan pengajuan</p>
-          <h1 className="mt-1 text-3xl font-bold text-heading">Permintaan Darah</h1>
-          <p className="mt-2 text-sm text-muted">
-            Pantau status seluruh permintaan darah yang diajukan.
-          </p>
-        </div>
-        <button
-          className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-border bg-surface px-4 py-3 text-sm font-bold text-foreground hover:bg-surface-muted"
-          onClick={reload}
-          type="button"
-        >
-          <RefreshCw aria-hidden="true" className="size-4" />
-          Muat ulang
-        </button>
+      <div className="mb-8">
+        <PageHeader
+          actions={
+            <button
+              className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-border bg-surface px-4 py-3 text-sm font-bold text-foreground hover:bg-surface-muted"
+              onClick={reload}
+              type="button"
+            >
+              <RefreshCw aria-hidden="true" className="size-4" />
+              Muat ulang
+            </button>
+          }
+          description="Pantau status seluruh permintaan darah yang diajukan."
+          eyebrow="Pelacakan pengajuan"
+          title="Permintaan Darah"
+        />
       </div>
 
       <div className="mb-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">

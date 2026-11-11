@@ -1,8 +1,8 @@
 import { CalendarDays, ClipboardList, Ticket } from 'lucide-react'
-import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 
 import { shortNameOf, useAuth } from '@/features/auth'
+import { PageHeader, StatCard } from '@/shared/ui'
 import { formatShortDate } from '@/shared/utils/format-date'
 
 import type { RegistrationDto } from '../../application/dto/donor-registration.dto'
@@ -13,26 +13,6 @@ const primaryLinkClass =
 
 const outlineLinkClass =
   'inline-flex min-h-11 items-center justify-center rounded-lg border border-primary px-5 py-2.5 text-sm font-semibold text-primary no-underline transition-colors hover:bg-primary-50'
-
-function StatCard({
-  icon,
-  label,
-  value,
-}: {
-  icon: ReactNode
-  label: string
-  value: string
-}) {
-  return (
-    <div className="rounded-2xl border border-border bg-surface p-5 shadow-field">
-      <span className="grid size-9 place-items-center rounded-full bg-primary-50 text-primary">
-        {icon}
-      </span>
-      <p className="mt-3 mb-0 text-xs text-muted">{label}</p>
-      <p className="mt-1 mb-0 text-lg font-bold text-heading">{value}</p>
-    </div>
-  )
-}
 
 function NextTicketCard({ registration }: { registration: RegistrationDto }) {
   return (
@@ -75,37 +55,27 @@ export function DonorDashboardPage() {
   const lastCompleted = completed[0]
 
   return (
-    <div className="w-full px-6 py-10 pb-20">
-      <header className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="m-0 text-xs font-bold tracking-[0.12em] text-primary uppercase">
-            Dashboard pendonor
-          </p>
-          <h1 className="mt-1.5 mb-0 text-3xl font-bold tracking-[-0.02em] text-heading">
-            Halo, {name}
-          </h1>
-          <p className="mt-2 mb-0 text-sm text-muted">
-            Cek jadwal donor terdekat atau lihat tiket yang sudah kamu daftarkan.
-          </p>
-        </div>
-        <Link className={primaryLinkClass} to="/jadwal-donor">
-          Cari lokasi donor
-        </Link>
-      </header>
+    <div className="w-full">
+      <PageHeader
+        actions={
+          <Link className={primaryLinkClass} to="/jadwal-donor">
+            Cari lokasi donor
+          </Link>
+        }
+        description="Cek jadwal donor terdekat atau lihat tiket yang sudah kamu daftarkan."
+        eyebrow="Dashboard pendonor"
+        title={`Halo, ${name}`}
+      />
 
       <dl className="mt-8 grid gap-4 sm:grid-cols-3">
+        <StatCard icon={Ticket} label="Tiket aktif" value={String(active.length)} />
         <StatCard
-          icon={<Ticket aria-hidden="true" className="size-4" />}
-          label="Tiket aktif"
-          value={String(active.length)}
-        />
-        <StatCard
-          icon={<ClipboardList aria-hidden="true" className="size-4" />}
+          icon={ClipboardList}
           label="Total donor selesai"
           value={String(completed.length)}
         />
         <StatCard
-          icon={<CalendarDays aria-hidden="true" className="size-4" />}
+          icon={CalendarDays}
           label="Donor terakhir"
           value={lastCompleted ? formatShortDate(lastCompleted.date) : 'Belum pernah'}
         />

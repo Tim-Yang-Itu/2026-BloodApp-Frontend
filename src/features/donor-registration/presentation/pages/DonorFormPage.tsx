@@ -24,7 +24,7 @@ export function DonorFormPage() {
 
   if (!locationId || !date || !time) {
     return (
-      <div className="w-full px-6 py-24 text-center">
+      <div className="w-full py-24 text-center">
         <h1 className="m-0 text-2xl font-bold text-heading">Pilih jadwal donor dulu</h1>
         <p className="mt-2 text-sm text-muted">
           Form donor butuh lokasi, tanggal, dan jam. Pilih jadwal dari halaman lokasi donor.
@@ -37,7 +37,7 @@ export function DonorFormPage() {
   }
 
   return (
-    <div className="w-full px-6 py-10 pb-20">
+    <div className="w-full">
       <DonorFormFlow
         date={date}
         locationAddress={locationAddress}

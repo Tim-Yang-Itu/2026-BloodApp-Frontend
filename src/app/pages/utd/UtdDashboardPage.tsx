@@ -6,43 +6,9 @@ import {
   useBloodStock,
 } from '@/features/blood-stock'
 import { useBloodRequests } from '@/features/blood-request'
-import { StatusBadge } from '@/shared/ui'
+import { PageHeader, StatCard, StatusBadge } from '@/shared/ui'
 
 import type { StockBagDto } from '@/features/blood-stock'
-
-const STAT_TONE = {
-  primary: 'bg-primary-50 text-primary',
-  warning: 'bg-warning/10 text-warning',
-  danger: 'bg-danger/10 text-danger',
-  info: 'bg-info/10 text-info',
-} as const
-
-type StatCardProps = {
-  label: string
-  value: number
-  unit: string
-  hint: string
-  icon: typeof Droplet
-  tone: keyof typeof STAT_TONE
-}
-
-function StatCard({ label, value, unit, hint, icon: Icon, tone }: StatCardProps) {
-  return (
-    <article className="rounded-2xl border border-border bg-surface p-5 shadow-field">
-      <div className="flex items-start justify-between gap-3">
-        <p className="m-0 text-xs font-semibold text-muted">{label}</p>
-        <span className={`grid size-8 shrink-0 place-items-center rounded-full ${STAT_TONE[tone]}`}>
-          <Icon aria-hidden="true" className="size-4" />
-        </span>
-      </div>
-      <p className="mt-3 mb-0 flex items-baseline gap-1.5 text-3xl leading-none font-extrabold text-heading">
-        {value}
-        <span className="text-xs font-medium text-muted">{unit}</span>
-      </p>
-      <p className="mt-1.5 mb-0 text-[11px] text-muted">{hint}</p>
-    </article>
-  )
-}
 
 function expiringLabel(bag: StockBagDto): string {
   return `${bag.daysUntilExpiry} hari`
@@ -105,46 +71,41 @@ export function UtdDashboardPage() {
   ].filter((activity): activity is { title: string; time: string } => activity !== null)
 
   return (
-    <div className="w-full px-6 py-8 pb-16 lg:px-8">
-      <header>
-        <h1 className="m-0 text-3xl font-bold tracking-[-0.02em] text-heading">Dashboard</h1>
-        <p className="mt-1.5 mb-0 text-sm text-muted">
-          Ringkasan stok darah dan permintaan rumah sakit
-        </p>
-      </header>
+    <div className="w-full">
+      <PageHeader
+        description="Ringkasan stok darah dan permintaan rumah sakit"
+        eyebrow="Dashboard UTD"
+        title="Dashboard"
+      />
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
-          hint="Dari 4 golongan darah"
           icon={Droplet}
           label="Total stok"
+          note="Dari 4 golongan darah"
           tone="primary"
-          unit="Kantong"
-          value={isStockLoading ? 0 : summary.total}
+          value={`${isStockLoading ? 0 : summary.total} Kantong`}
         />
         <StatCard
-          hint="Expired dalam 7 hari"
           icon={Clock}
           label="Hampir expired"
+          note="Expired dalam 7 hari"
           tone="warning"
-          unit="Kantong"
-          value={isStockLoading ? 0 : summary.expiringSoon}
+          value={`${isStockLoading ? 0 : summary.expiringSoon} Kantong`}
         />
         <StatCard
-          hint="Perlu dikeluarkan dari stok"
           icon={AlertCircle}
           label="Sudah expired"
+          note="Perlu dikeluarkan dari stok"
           tone="danger"
-          unit="Kantong"
-          value={isStockLoading ? 0 : summary.expired}
+          value={`${isStockLoading ? 0 : summary.expired} Kantong`}
         />
         <StatCard
-          hint="Butuh verifikasi"
           icon={Inbox}
           label="Permintaan Menunggu"
+          note="Butuh verifikasi"
           tone="info"
-          unit="Request"
-          value={isRequestsLoading ? 0 : pendingCount}
+          value={`${isRequestsLoading ? 0 : pendingCount} Permintaan`}
         />
       </div>
 
