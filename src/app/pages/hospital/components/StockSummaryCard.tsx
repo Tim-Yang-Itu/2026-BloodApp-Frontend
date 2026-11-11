@@ -31,7 +31,7 @@ export function StockSummaryCard({ groups, onViewAll }: StockSummaryCardProps) {
     <section className="rounded-2xl border border-border bg-surface p-5 sm:p-6">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h2 className="text-lg font-bold text-heading">Ringkasan stok</h2>
+          <h2 className="text-lg font-bold text-heading font-sans">Ringkasan stok</h2>
           <p className="mt-1 text-xs text-muted">Ketersediaan kantong darah saat ini</p>
         </div>
         <button

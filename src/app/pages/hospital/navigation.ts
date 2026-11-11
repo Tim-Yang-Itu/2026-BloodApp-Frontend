@@ -19,8 +19,3 @@ export const HOSPITAL_NAV_ITEMS: readonly HospitalNavItem[] = [
 export function hospitalPathOf(tab: HospitalTab): string {
   return HOSPITAL_NAV_ITEMS.find((item) => item.id === tab)?.to ?? ROUTES.hospitalDashboard
 }
-
-/** Item navigasi yang cocok dengan pathname aktif (fallback: Dashboard). */
-export function hospitalNavItemOf(pathname: string): HospitalNavItem {
-  return HOSPITAL_NAV_ITEMS.find((item) => item.to === pathname) ?? HOSPITAL_NAV_ITEMS[0]
-}

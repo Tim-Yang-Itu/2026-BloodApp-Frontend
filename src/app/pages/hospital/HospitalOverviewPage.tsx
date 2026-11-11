@@ -2,21 +2,21 @@ import { AlertTriangle, CircleCheck, Clock3, Droplet, PackageX } from 'lucide-re
 import { useNavigate } from 'react-router-dom'
 
 import { useAuth } from '@/features/auth'
-import { useBloodRequests } from '@/features/blood-request'
 import { MINIMUM_STOCK_PER_GROUP, useBloodStock } from '@/features/blood-stock'
+import { PageHeader, StatCard } from '@/shared/ui'
 import { formatLongDate } from '@/shared/utils/format-date'
 
 import { RecentRequestsCard } from './components/RecentRequestsCard'
-import { StatCard } from './components/StatCard'
 import { StockSummaryCard } from './components/StockSummaryCard'
 import { hospitalPathOf } from './navigation'
+import { useHospitalRequests } from './use-hospital-requests'
 import { toStockGroups } from './view-model'
 
 /** RS-02/RS-04: ringkasan stok darah dan permintaan rumah sakit. */
 export function HospitalOverviewPage() {
   const { user } = useAuth()
   const { summary, today } = useBloodStock()
-  const { requests } = useBloodRequests()
+  const { requests } = useHospitalRequests()
   const navigate = useNavigate()
 
   const adminName = user?.profile.fullName ?? 'Admin RS'
@@ -27,24 +27,22 @@ export function HospitalOverviewPage() {
 
   return (
     <>
-      <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="text-sm font-semibold text-primary">{formatLongDate(today)}</p>
-          <h1 className="mt-1 text-3xl font-bold tracking-tight text-heading sm:text-4xl">
-            Selamat datang, {adminName}
-          </h1>
-          <p className="mt-2 text-sm text-muted">
-            Pantau ketersediaan darah dan permintaan rumah sakit hari ini.
-          </p>
-        </div>
-        <button
-          className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-bold text-on-primary shadow-field hover:bg-primary-hover"
-          onClick={() => navigate(hospitalPathOf('requests'))}
-          type="button"
-        >
-          <Droplet aria-hidden="true" className="size-4" />
-          Lihat permintaan
-        </button>
+      <div className="mb-8">
+        <PageHeader
+          actions={
+            <button
+              className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-bold text-on-primary shadow-field hover:bg-primary-hover"
+              onClick={() => navigate(hospitalPathOf('requests'))}
+              type="button"
+            >
+              <Droplet aria-hidden="true" className="size-4" />
+              Lihat permintaan
+            </button>
+          }
+          description="Pantau ketersediaan darah dan permintaan rumah sakit hari ini."
+          eyebrow={formatLongDate(today)}
+          title={`Selamat datang, ${adminName}`}
+        />
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">

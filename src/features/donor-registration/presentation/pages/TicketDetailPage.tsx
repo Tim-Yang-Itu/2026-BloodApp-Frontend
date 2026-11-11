@@ -39,7 +39,7 @@ export function TicketDetailPage() {
 
   if (notFound || !registration) {
     return (
-      <div className="w-full px-6 py-24 text-center">
+      <div className="w-full py-24 text-center">
         <h1 className="m-0 text-2xl font-bold text-heading">Tiket tidak ditemukan</h1>
         <p className="mt-2 text-sm text-muted">
           Kode booking yang kamu buka tidak ada. Cek lagi daftar tiket di halaman Tiket Saya.
@@ -52,7 +52,7 @@ export function TicketDetailPage() {
   }
 
   return (
-    <div className="w-full px-6 py-10 pb-20">
+    <div className="w-full">
       <div className="rounded-2xl bg-success/10 px-5 py-4">
         <p className="m-0 flex items-center gap-2 text-sm font-bold text-success">
           <CheckCircle2 aria-hidden="true" className="size-4" />
@@ -76,7 +76,7 @@ export function TicketDetailPage() {
       <div className="mt-5 grid gap-6 rounded-2xl border border-border bg-surface p-6 sm:grid-cols-2">
         {TIPS.map((tip) => (
           <div key={tip.title}>
-            <h2 className="m-0 text-sm font-bold text-heading">{tip.title}</h2>
+            <h2 className="m-0 text-sm font-bold text-heading font-sans">{tip.title}</h2>
             <ul className="mt-2 list-none space-y-1.5 p-0">
               {tip.items.map((item) => (
                 <li className="text-xs leading-relaxed text-muted" key={item}>

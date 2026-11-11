@@ -12,8 +12,25 @@ import { DEMO_BLOOD_REQUESTS } from '../demo/demo-blood-requests'
 export class InMemoryBloodRequestRepository implements BloodRequestRepository {
   private requests: BloodRequest[]
 
+  private readonly listeners = new Set<() => void>()
+
   constructor(seed: readonly BloodRequest[] = DEMO_BLOOD_REQUESTS) {
     this.requests = seed.map((request) => ({ ...request }))
+  }
+
+  /**
+   * Memberi tahu pendengar setiap kali data berubah.
+   *
+   * Satu repositori dibagikan ke beberapa komponen (daftar permintaan, lencana
+   * sidebar, dashboard). Tanpa langganan, lencana tetap menampilkan jumlah lama
+   * setelah RS mengajukan permintaan baru.
+   */
+  subscribe(listener: () => void): () => void {
+    this.listeners.add(listener)
+
+    return () => {
+      this.listeners.delete(listener)
+    }
   }
 
   async findAll(): Promise<readonly BloodRequest[]> {
@@ -24,6 +41,15 @@ export class InMemoryBloodRequestRepository implements BloodRequestRepository {
     const request = this.requests.find((item) => item.id === requestId)
 
     return request ? { ...request } : null
+  }
+
+  async create(request: BloodRequest): Promise<BloodRequest> {
+    const created: BloodRequest = { ...request }
+
+    this.requests = [created, ...this.requests]
+    this.notify()
+
+    return { ...created }
   }
 
   async updateStatus(
@@ -44,7 +70,12 @@ export class InMemoryBloodRequestRepository implements BloodRequestRepository {
     }
 
     this.requests[index] = updated
+    this.notify()
 
     return { ...updated }
+  }
+
+  private notify(): void {
+    this.listeners.forEach((listener) => listener())
   }
 }

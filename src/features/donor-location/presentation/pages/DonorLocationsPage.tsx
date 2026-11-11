@@ -1,6 +1,6 @@
 import { useDeferredValue, useState } from 'react'
 
-import { PublicNavbar } from '@/shared/ui'
+import { PageHeader, PublicNavbar } from '@/shared/ui'
 
 import { LocationListCard } from '../components/LocationListCard'
 import { LocationMapPreview } from '../components/LocationMapPreview'
@@ -42,10 +42,9 @@ export function DonorLocationsPage({ embedded = false }: DonorLocationsPageProps
 
   const detailBasePath = embedded ? '/jadwal-donor' : '/lokasi-donor'
 
-  // Di dalam area pendonor, ukuran & padding mengikuti halaman fitur lain
-  // (dashboard, tiket, form donor) agar tampilan konsisten.
+  // Di dalam area pendonor, padding halaman sudah disediakan layout peran.
   const containerClass = embedded
-    ? 'w-full px-6 py-10 pb-20'
+    ? 'w-full'
     : 'mx-auto w-[calc(100%-3rem)] max-w-[1180px] py-10 pb-20'
 
   return (
@@ -53,27 +52,22 @@ export function DonorLocationsPage({ embedded = false }: DonorLocationsPageProps
       {embedded ? null : <PublicNavbar activeNav="lokasi" showAuthActions={false} />}
 
       <main className={containerClass}>
-        <header>
-          {embedded ? (
-            <p className="m-0 text-xs font-bold tracking-[0.12em] text-primary uppercase">
-              Cari jadwal donor
+        {embedded ? (
+          <PageHeader
+            description="Temukan tempat donor terdekat, lalu pilih jadwal dan isi form donor."
+            eyebrow="Cari jadwal donor"
+            title="Lokasi Donor Darah"
+          />
+        ) : (
+          <header>
+            <h1 className="text-[clamp(2rem,4vw,3rem)] font-bold tracking-[-0.015em] text-heading">
+              Lokasi Donor Darah
+            </h1>
+            <p className="mt-2 text-muted">
+              Temukan tempat donor terdekat. Tidak perlu login untuk melihat lokasi.
             </p>
-          ) : null}
-          <h1
-            className={
-              embedded
-                ? 'mt-1.5 mb-0 text-3xl font-bold tracking-[-0.02em] text-heading'
-                : 'text-[clamp(2rem,4vw,3rem)] font-bold tracking-[-0.015em] text-heading'
-            }
-          >
-            Lokasi Donor Darah
-          </h1>
-          <p className={embedded ? 'mt-2 mb-0 text-sm text-muted' : 'mt-2 text-muted'}>
-            {embedded
-              ? 'Temukan tempat donor terdekat, lalu pilih jadwal dan isi form donor.'
-              : 'Temukan tempat donor terdekat. Tidak perlu login untuk melihat lokasi.'}
-          </p>
-        </header>
+          </header>
+        )}
 
         <div className={embedded ? 'mt-6' : 'mt-7'}>
           <LocationSearchBar

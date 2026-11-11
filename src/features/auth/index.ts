@@ -21,7 +21,7 @@ export type { LoginInput, RegisterDonorInput } from './application/dto/auth.dto'
 export type { AuthUser, DonorProfile, UserRole } from './domain/entities/user'
 export { initialsOf, shortNameOf } from './domain/entities/user'
 export { authErrorMessage } from './domain/errors/auth-error'
-export { roleHomePath, safeRedirectPath } from './domain/rules/role-home'
+export { isPathOwnedByRole, roleHomePath, safeLandingPath, safeRedirectPath } from './domain/rules/role-home'
 
 export { AuthProvider } from './presentation/contexts/AuthProvider'
 export { useAuth } from './presentation/hooks/use-auth'

@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 
 import { useAuth } from '@/features/auth'
+import { PageHeader } from '@/shared/ui'
 import { formatLongDate } from '@/shared/utils/format-date'
 
 import type { RegistrationDto } from '../../application/dto/donor-registration.dto'
@@ -21,7 +22,7 @@ function TicketRow({ registration }: { registration: RegistrationDto }) {
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <p className="m-0 text-xs text-muted">{registration.bookingCode}</p>
-          <h3 className="mt-1 mb-0 text-base font-bold text-heading">{registration.locationName}</h3>
+          <h3 className="mt-1 mb-0 text-2xl font-bold text-heading font-sans">{registration.locationName}</h3>
           <p className="mt-0.5 mb-0 text-xs text-muted">{registration.locationAddress}</p>
         </div>
         <span
@@ -41,7 +42,7 @@ function TicketRow({ registration }: { registration: RegistrationDto }) {
           className="text-xs font-semibold text-primary no-underline hover:underline"
           to={`/tiket-saya/${registration.bookingCode}`}
         >
-          Lihat tiket →
+          Lihat tiket
         </Link>
       </div>
     </li>
@@ -57,18 +58,16 @@ export function MyTicketsPage() {
   const history = registrations.filter((item) => item.status !== 'scheduled')
 
   return (
-    <div className="w-full px-6 py-10 pb-20">
-      <header className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="m-0 text-3xl font-bold tracking-[-0.02em] text-heading">Tiket Saya</h1>
-          <p className="mt-2 mb-0 text-sm text-muted">
-            Tiket yang belum dipakai dan riwayat donor yang sudah selesai.
-          </p>
-        </div>
-        <Link className={primaryLinkClass} to="/jadwal-donor">
-          Donor lagi
-        </Link>
-      </header>
+    <div className="w-full">
+      <PageHeader
+        actions={
+          <Link className={primaryLinkClass} to="/jadwal-donor">
+            Donor lagi
+          </Link>
+        }
+        description="Tiket yang belum dipakai dan riwayat donor yang sudah selesai."
+        title="Tiket Saya"
+      />
 
       {isLoading ? (
         <p className="mt-10 text-sm text-muted">Memuat tiket…</p>
@@ -97,7 +96,7 @@ export function MyTicketsPage() {
 
       {active.length > 0 ? (
         <section className="mt-8">
-          <h2 className="m-0 text-sm font-bold text-heading">Tiket aktif</h2>
+          <h2 className="m-0 text-sm font-bold text-heading font-sans">Tiket aktif</h2>
           <ul className="mt-3 list-none space-y-3 p-0">
             {active.map((registration) => (
               <TicketRow key={registration.id} registration={registration} />
@@ -108,7 +107,7 @@ export function MyTicketsPage() {
 
       {history.length > 0 ? (
         <section className="mt-8">
-          <h2 className="m-0 text-sm font-bold text-heading">Riwayat</h2>
+          <h2 className="m-0 text-sm font-bold text-heading font-sans">Riwayat</h2>
           <ul className="mt-3 list-none space-y-3 p-0">
             {history.map((registration) => (
               <TicketRow key={registration.id} registration={registration} />

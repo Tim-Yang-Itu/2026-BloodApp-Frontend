@@ -36,6 +36,12 @@ export type AuthUser = {
   email: string
   role: UserRole
   profile: DonorProfile
+  /**
+   * Nama rumah sakit asal admin RS (mis. `RS Harapan Sehat`).
+   * `null`/tidak ada untuk peran `donor` dan `utd`, karena keduanya tidak
+   * terikat pada satu rumah sakit.
+   */
+  hospitalName?: string | null
   createdAt: string
 }
 

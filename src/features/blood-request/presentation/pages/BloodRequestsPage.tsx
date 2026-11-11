@@ -1,7 +1,7 @@
 import { CheckCircle2, ClipboardList, XCircle } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
-import { Button, StatusBadge, controlClass, labelClass } from '@/shared/ui'
+import { Button, PageHeader, StatusBadge, controlClass, labelClass } from '@/shared/ui'
 
 import type { BloodRequestDto } from '../../application/dto/blood-request.dto'
 import type { BloodRequestStatus } from '../../domain/entities/blood-request'
@@ -83,15 +83,12 @@ export function BloodRequestsPage({ stockAvailability }: BloodRequestsPageProps)
   }
 
   return (
-    <div className="w-full px-6 py-8 pb-16 lg:px-8">
-      <header>
-        <h1 className="m-0 text-3xl font-bold tracking-[-0.02em] text-heading">
-          Permintaan Rumah Sakit
-        </h1>
-        <p className="mt-1.5 mb-0 text-sm text-muted">
-          Verifikasi permintaan sebelum menyetujui pengeluaran kantong darah.
-        </p>
-      </header>
+    <div className="w-full">
+      <PageHeader
+        description="Verifikasi permintaan sebelum menyetujui pengeluaran kantong darah."
+        eyebrow="Verifikasi permintaan"
+        title="Permintaan Rumah Sakit"
+      />
 
       <div className="mt-6 flex flex-wrap gap-2">
         {FILTERS.map((item) => {
@@ -133,7 +130,7 @@ export function BloodRequestsPage({ stockAvailability }: BloodRequestsPageProps)
       <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
         <section className="overflow-hidden rounded-2xl border border-border bg-surface shadow-field">
           <div className="border-b border-border px-5 py-4">
-            <h2 className="m-0 text-lg font-bold text-heading">Daftar permintaan</h2>
+            <h2 className="m-0 text-lg font-bold text-heading font-sans">Daftar permintaan</h2>
             <p className="mt-1 mb-0 text-xs text-muted">
               {filteredRequests.length} permintaan pada filter ini
             </p>
@@ -223,7 +220,7 @@ export function BloodRequestsPage({ stockAvailability }: BloodRequestsPageProps)
 
         <aside className="h-fit rounded-2xl border border-border bg-surface p-5 shadow-field">
           <div className="flex items-center justify-between gap-3">
-            <h2 className="m-0 text-lg font-bold text-heading">Detail permintaan</h2>
+            <h2 className="m-0 text-lg font-bold text-heading font-sans">Detail permintaan</h2>
             {selected ? (
               <StatusBadge label={selected.statusLabel} tone={selected.statusTone} />
             ) : null}

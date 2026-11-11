@@ -196,13 +196,14 @@ tinggal di `src/app/pages/<peran>/` dan hanya memakai API publik `features/<x>/i
 | Halaman | Modul PRD | Fitur yang dipakai | Rute |
 | --- | --- | --- | --- |
 | `app/pages/utd` | UTD-04, UTD-06 | `blood-stock`, `blood-request` | `/utd`, `/utd/permintaan` |
-| `app/pages/hospital` | RS-02, RS-04, RS-06 | `blood-stock`, `blood-request` | `/dashboard-rs`, `/dashboard-rs/stok`, `/dashboard-rs/permintaan` |
+| `app/pages/hospital` | RS-02, RS-03, RS-04, RS-06 | `blood-stock`, `blood-request` | `/dashboard-rs`, `/dashboard-rs/stok`, `/dashboard-rs/permintaan`, `/dashboard-rs/permintaan/baru` |
 | `app/pages/donor` | PDN-03 | `donor-location` + `donor-registration` | `/jadwal-donor/:locationId` |
 | `app/pages/public` | – | shell publik + halaman 404 | `*` |
 
 Setiap tab pada dashboard RS adalah rute nyata (`HospitalLayout` di `src/app/layouts/` sebagai
 layout route): `overview` = RS-02 ringkasan (`/dashboard-rs`, index), `stock` = RS-02 detail
-ketersediaan (`/dashboard-rs/stok`), `requests` = RS-04/RS-06 (`/dashboard-rs/permintaan`).
+ketersediaan (`/dashboard-rs/stok`), `requests` = RS-04/RS-06 (`/dashboard-rs/permintaan`), dan
+`requestNew` = RS-03 form pengajuan baru (`/dashboard-rs/permintaan/baru`, bukan tab sidebar).
 Daftar menu beserta ikonnya ada di `app/pages/hospital/navigation.ts` (`HOSPITAL_NAV_ITEMS`),
 sehingga sidebar memakai `NavLink` dan posisi halaman bertahan setelah refresh.
 
@@ -227,7 +228,7 @@ sehingga sidebar memakai `NavLink` dan posisi halaman bertahan setelah refresh.
 | PDN-06 | Tiket digital QR Code | `donor-registration` | `issue-ticket.use-case`, `scan-ticket.use-case` | `/donor/tiket`, `/utd/scan` |
 | RS-01 | Login dashboard RS | `auth` | `login.use-case` | `/login` |
 | RS-02 | Cek ketersediaan real time | `blood-stock` | `get-availability.use-case` | `/dashboard-rs`, `/dashboard-rs/stok` |
-| RS-03 | Form request darah | `blood-request` | `create-request.use-case` | `/rs/permintaan/baru` |
+| RS-03 | Form request darah | `blood-request` | `create-request.use-case` | `/dashboard-rs/permintaan/baru` (`app/pages/hospital`) |
 | RS-04 | Pelacakan status | `blood-request` | `list-requests.use-case`, `get-request.use-case` | `/dashboard-rs/permintaan` |
 | RS-05 | Push notifikasi gagal | `notification` | `notify-request-rejected.use-case` | `NotificationBell` |
 | RS-06 | Konfirmasi penerimaan | `blood-request` | `confirm-receipt.use-case` | `/dashboard-rs/permintaan` |
@@ -407,7 +408,7 @@ Langkah berikutnya yang disarankan (mengikuti prioritas **Wajib** PRD):
 2. **`auth`** — selesai (`LoginPage`, `RegisterPage`, `RequireAuth`/`RequireRole`, sesi `localStorage`).
 3. **`app`** — selesai (`container.ts`, `router/AppRoutes.tsx`, `providers/AppProviders.tsx`, `layouts/*`).
 4. **`blood-stock`** — sebagian: UTD-02/03/04, RS-02 (input kantong + monitoring + ketersediaan).
-5. **`blood-request`** — sebagian: UTD-06/07/08, RS-04/RS-06; RS-03 (form request baru) belum ada.
+5. **`blood-request`** — sebagian: UTD-06/07/08, RS-03/RS-04/RS-06; RS-05 (notifikasi penolakan) belum ada.
 6. **`donor-location`** — sebagian: PDN-02, PDN-03 (EXT-03 filter belum lengkap) + menu kelola lokasi UTD.
 7. **`donor-registration`** — sebagian: PDN-05 (form + screening) dan PDN-06 tiket digital; scan tiket di sisi UTD belum.
 8. **`notification`** — belum diimplementasikan (UTD-05, RS-05, EXT-01, EXT-04).
