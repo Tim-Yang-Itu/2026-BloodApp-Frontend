@@ -23,7 +23,7 @@ export function LocationOverviewCard({ detail }: LocationOverviewCardProps) {
         )}
       </div>
 
-      <h1 className="mt-2 text-[clamp(1.9rem,3.5vw,2.6rem)] font-bold tracking-[-0.015em] text-heading">
+      <h1 className="mt-2 text-3xl font-bold tracking-[-0.015em] text-heading">
         {detail.name}
       </h1>
       <p className="mt-1 text-sm text-muted">{detail.addressLine}</p>
@@ -50,7 +50,7 @@ export function LocationOverviewCard({ detail }: LocationOverviewCardProps) {
       </dl>
 
       <div className="mt-6">
-        <h2 className="text-sm font-semibold text-foreground">Golongan darah yang dibutuhkan</h2>
+        <h2 className="text-sm font-semibold text-foreground font-sans">Golongan darah yang dibutuhkan</h2>
         <ul className="mt-3 flex list-none flex-wrap gap-2 p-0">
           {detail.neededBloodTypes.map((bloodType) => (
             <li

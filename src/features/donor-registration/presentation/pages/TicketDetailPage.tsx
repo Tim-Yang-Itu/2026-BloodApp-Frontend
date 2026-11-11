@@ -76,7 +76,7 @@ export function TicketDetailPage() {
       <div className="mt-5 grid gap-6 rounded-2xl border border-border bg-surface p-6 sm:grid-cols-2">
         {TIPS.map((tip) => (
           <div key={tip.title}>
-            <h2 className="m-0 text-sm font-bold text-heading">{tip.title}</h2>
+            <h2 className="m-0 text-sm font-bold text-heading font-sans">{tip.title}</h2>
             <ul className="mt-2 list-none space-y-1.5 p-0">
               {tip.items.map((item) => (
                 <li className="text-xs leading-relaxed text-muted" key={item}>

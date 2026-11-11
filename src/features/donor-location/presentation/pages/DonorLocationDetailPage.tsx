@@ -131,7 +131,7 @@ export function DonorLocationDetailPage({
               <LocationOverviewCard detail={detail} />
 
               <section className="rounded-2xl border border-border bg-surface p-6 shadow-sm">
-                <h2 className="text-lg font-bold text-heading">Pilih jadwal donor</h2>
+                <h2 className="text-lg font-bold text-heading font-sans">Pilih jadwal donor</h2>
                 <div className="mt-4">
                   <SchedulePicker
                     days={detail.schedule}
@@ -150,7 +150,7 @@ export function DonorLocationDetailPage({
               />
             </div>
 
-            <div className="lg:sticky lg:top-24">
+            <div className="lg:sticky lg:top-16">
               <DonationIntentCard
                 date={activeDay?.date ?? ''}
                 dateLabel={activeDay?.longDate ?? 'Pilih tanggal'}

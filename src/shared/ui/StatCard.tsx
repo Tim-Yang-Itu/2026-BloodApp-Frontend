@@ -23,14 +23,16 @@ type StatCardProps = {
 /** Kartu angka ringkasan yang dipakai di semua dashboard peran. */
 export function StatCard({ icon: Icon, label, value, note, tone = 'primary' }: StatCardProps) {
   return (
-    <article className="rounded-2xl border border-border bg-surface p-5 shadow-field">
+    <article className="flex h-full flex-col rounded-2xl border border-border bg-surface p-5 shadow-field">
       <div className="flex items-start justify-between gap-3">
         <p className="m-0 text-xs font-semibold text-muted">{label}</p>
         <span className={`grid size-9 shrink-0 place-items-center rounded-full ${TONE_CLASS[tone]}`}>
           <Icon aria-hidden="true" className="size-4" />
         </span>
       </div>
-      <p className="mt-3 mb-0 text-3xl leading-none font-extrabold text-heading">{value}</p>
+      <p className="mt-auto mb-0 pt-3 text-3xl leading-tight font-extrabold break-words text-heading">
+        {value}
+      </p>
       {note ? <p className="mt-1.5 mb-0 text-[11px] text-muted">{note}</p> : null}
     </article>
   )

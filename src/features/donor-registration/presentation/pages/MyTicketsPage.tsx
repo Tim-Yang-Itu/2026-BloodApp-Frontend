@@ -22,7 +22,7 @@ function TicketRow({ registration }: { registration: RegistrationDto }) {
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <p className="m-0 text-xs text-muted">{registration.bookingCode}</p>
-          <h3 className="mt-1 mb-0 text-base font-bold text-heading">{registration.locationName}</h3>
+          <h3 className="mt-1 mb-0 text-2xl font-bold text-heading font-sans">{registration.locationName}</h3>
           <p className="mt-0.5 mb-0 text-xs text-muted">{registration.locationAddress}</p>
         </div>
         <span
@@ -42,7 +42,7 @@ function TicketRow({ registration }: { registration: RegistrationDto }) {
           className="text-xs font-semibold text-primary no-underline hover:underline"
           to={`/tiket-saya/${registration.bookingCode}`}
         >
-          Lihat tiket →
+          Lihat tiket
         </Link>
       </div>
     </li>
@@ -96,7 +96,7 @@ export function MyTicketsPage() {
 
       {active.length > 0 ? (
         <section className="mt-8">
-          <h2 className="m-0 text-sm font-bold text-heading">Tiket aktif</h2>
+          <h2 className="m-0 text-sm font-bold text-heading font-sans">Tiket aktif</h2>
           <ul className="mt-3 list-none space-y-3 p-0">
             {active.map((registration) => (
               <TicketRow key={registration.id} registration={registration} />
@@ -107,7 +107,7 @@ export function MyTicketsPage() {
 
       {history.length > 0 ? (
         <section className="mt-8">
-          <h2 className="m-0 text-sm font-bold text-heading">Riwayat</h2>
+          <h2 className="m-0 text-sm font-bold text-heading font-sans">Riwayat</h2>
           <ul className="mt-3 list-none space-y-3 p-0">
             {history.map((registration) => (
               <TicketRow key={registration.id} registration={registration} />
